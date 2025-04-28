@@ -1,0 +1,195 @@
+[2025-04-06 10:08:01] [✓] STAT - ID 14 (số 46 lưu quang vũ): +4380 bản ghi mới
+[2025-04-06 10:08:03] [✓] AQI - ID 14 (số 46 lưu quang vũ): +180 bản ghi mới
+[2025-04-06 10:08:04] [✓] STAT - ID 15 (minh khai bắc từ liêm): +4380 bản ghi mới
+[2025-04-06 10:08:05] [✓] AQI - ID 15 (minh khai bắc từ liêm): +180 bản ghi mới
+[2025-04-06 10:08:06] [✓] STAT - ID 31 (đào duy từ): +2920 bản ghi mới
+[2025-04-06 10:08:06] [✓] AQI - ID 31 (đào duy từ): +120 bản ghi mới
+[2025-04-06 10:08:07] [✓] STAT - ID 38 (an khánh): +2920 bản ghi mới
+[2025-04-06 10:08:08] [✓] AQI - ID 38 (an khánh): +120 bản ghi mới
+[2025-04-06 10:08:08] [✓] STAT - ID 39 (vân hà): +2920 bản ghi mới
+[2025-04-06 10:08:09] [✓] AQI - ID 39 (vân hà): +120 bản ghi mới
+[2025-04-06 10:08:09] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-04-06 10:08:09] ===== Kết thúc crawl =====
+
+[2025-04-06 10:09:02] [✓] STAT - ID 14 (số 46 lưu quang vũ): +0 bản ghi mới
+[2025-04-06 10:09:03] [✓] AQI - ID 14 (số 46 lưu quang vũ): +0 bản ghi mới
+[2025-04-06 10:09:04] [✓] STAT - ID 15 (minh khai bắc từ liêm): +0 bản ghi mới
+[2025-04-06 10:09:06] [✓] AQI - ID 15 (minh khai bắc từ liêm): +0 bản ghi mới
+[2025-04-06 10:09:06] [✓] STAT - ID 31 (đào duy từ): +0 bản ghi mới
+[2025-04-06 10:09:07] [✓] AQI - ID 31 (đào duy từ): +0 bản ghi mới
+[2025-04-06 10:09:08] [✓] STAT - ID 38 (an khánh): +0 bản ghi mới
+[2025-04-06 10:09:08] [✓] AQI - ID 38 (an khánh): +0 bản ghi mới
+[2025-04-06 10:09:09] [✓] STAT - ID 39 (vân hà): +0 bản ghi mới
+[2025-04-06 10:09:10] [✓] AQI - ID 39 (vân hà): +0 bản ghi mới
+[2025-04-06 10:09:10] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-04-06 10:09:10] ===== Kết thúc crawl =====
+
+[2025-04-07 21:39:22] [✓] STAT - ID 14 (số 46 lưu quang vũ): +216 bản ghi mới
+[2025-04-07 21:39:24] [✓] AQI - ID 14 (số 46 lưu quang vũ): +180 bản ghi mới
+[2025-04-07 21:39:25] [✓] STAT - ID 15 (minh khai bắc từ liêm): +216 bản ghi mới
+[2025-04-07 21:39:27] [✓] AQI - ID 15 (minh khai bắc từ liêm): +180 bản ghi mới
+[2025-04-07 21:39:27] [✓] STAT - ID 31 (đào duy từ): +144 bản ghi mới
+[2025-04-07 21:39:28] [✓] AQI - ID 31 (đào duy từ): +120 bản ghi mới
+[2025-04-07 21:39:29] [✓] STAT - ID 38 (an khánh): +144 bản ghi mới
+[2025-04-07 21:39:30] [✓] AQI - ID 38 (an khánh): +120 bản ghi mới
+[2025-04-07 21:39:31] [✓] STAT - ID 39 (vân hà): +144 bản ghi mới
+[2025-04-07 21:39:33] [✓] AQI - ID 39 (vân hà): +120 bản ghi mới
+[2025-04-07 21:39:34] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-04-07 21:39:34] ===== Kết thúc crawl =====
+
+[2025-04-10 00:00:03] [✓] STAT - ID 14 (số 46 lưu quang vũ): +300 bản ghi mới
+[2025-04-10 00:00:05] [✓] AQI - ID 14 (số 46 lưu quang vũ): +180 bản ghi mới
+[2025-04-10 00:00:06] [✓] STAT - ID 15 (minh khai bắc từ liêm): +300 bản ghi mới
+[2025-04-10 00:00:08] [✓] AQI - ID 15 (minh khai bắc từ liêm): +180 bản ghi mới
+[2025-04-10 00:00:09] [✓] STAT - ID 31 (đào duy từ): +200 bản ghi mới
+[2025-04-10 00:00:09] [✓] AQI - ID 31 (đào duy từ): +120 bản ghi mới
+[2025-04-10 00:00:10] [✓] STAT - ID 38 (an khánh): +200 bản ghi mới
+[2025-04-10 00:00:11] [✓] AQI - ID 38 (an khánh): +120 bản ghi mới
+[2025-04-10 00:00:12] [✓] STAT - ID 39 (vân hà): +200 bản ghi mới
+[2025-04-10 00:00:13] [✓] AQI - ID 39 (vân hà): +120 bản ghi mới
+[2025-04-10 00:00:13] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-04-10 00:00:13] ===== Kết thúc crawl =====
+
+[2025-04-13 23:56:04] [✓] STAT - ID 14 (số 46 lưu quang vũ): +576 bản ghi mới
+[2025-04-13 23:56:05] [✓] AQI - ID 14 (số 46 lưu quang vũ): +180 bản ghi mới
+[2025-04-13 23:56:05] [✓] STAT - ID 15 (minh khai bắc từ liêm): +576 bản ghi mới
+[2025-04-13 23:56:07] [✓] AQI - ID 15 (minh khai bắc từ liêm): +180 bản ghi mới
+[2025-04-13 23:56:07] [✓] STAT - ID 31 (đào duy từ): +384 bản ghi mới
+[2025-04-13 23:56:08] [✓] AQI - ID 31 (đào duy từ): +120 bản ghi mới
+[2025-04-13 23:56:09] [✓] STAT - ID 38 (an khánh): +384 bản ghi mới
+[2025-04-13 23:56:09] [✓] AQI - ID 38 (an khánh): +120 bản ghi mới
+[2025-04-13 23:56:10] [✓] STAT - ID 39 (vân hà): +384 bản ghi mới
+[2025-04-13 23:56:10] [✓] AQI - ID 39 (vân hà): +120 bản ghi mới
+[2025-04-13 23:56:10] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-04-13 23:56:10] ===== Kết thúc crawl =====
+
+[2025-04-14 00:00:01] [✓] STAT - ID 14 (số 46 lưu quang vũ): +0 bản ghi mới
+[2025-04-14 00:00:03] [✓] AQI - ID 14 (số 46 lưu quang vũ): +0 bản ghi mới
+[2025-04-14 00:00:04] [✓] STAT - ID 15 (minh khai bắc từ liêm): +0 bản ghi mới
+[2025-04-14 00:00:06] [✓] AQI - ID 15 (minh khai bắc từ liêm): +0 bản ghi mới
+[2025-04-14 00:00:07] [✓] STAT - ID 31 (đào duy từ): +0 bản ghi mới
+[2025-04-14 00:00:07] [✓] AQI - ID 31 (đào duy từ): +0 bản ghi mới
+[2025-04-14 00:00:08] [✓] STAT - ID 38 (an khánh): +0 bản ghi mới
+[2025-04-14 00:00:09] [✓] AQI - ID 38 (an khánh): +0 bản ghi mới
+[2025-04-14 00:00:10] [✓] STAT - ID 39 (vân hà): +0 bản ghi mới
+[2025-04-14 00:00:11] [✓] AQI - ID 39 (vân hà): +0 bản ghi mới
+[2025-04-14 00:00:11] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-04-14 00:00:11] ===== Kết thúc crawl =====
+
+[2025-04-15 00:00:11] [✓] STAT - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-04-15 00:00:13] [✓] AQI - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-04-15 00:00:14] [✓] STAT - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-04-15 00:00:16] [✓] AQI - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-04-15 00:00:17] [✓] STAT - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-04-15 00:00:17] [✓] AQI - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-04-15 00:00:18] [✓] STAT - ID 38 (an khánh): +96 bản ghi mới
+[2025-04-15 00:00:19] [✓] AQI - ID 38 (an khánh): +96 bản ghi mới
+[2025-04-15 00:00:20] [✓] STAT - ID 39 (vân hà): +96 bản ghi mới
+[2025-04-15 00:00:21] [✓] AQI - ID 39 (vân hà): +96 bản ghi mới
+[2025-04-15 00:00:21] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-04-15 00:00:21] ===== Kết thúc crawl =====
+
+[2025-04-16 00:00:02] [✓] STAT - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-04-16 00:00:04] [✓] AQI - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-04-16 00:00:05] [✓] STAT - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-04-16 00:00:07] [✓] AQI - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-04-16 00:00:07] [✓] STAT - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-04-16 00:00:08] [✓] AQI - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-04-16 00:00:09] [✓] STAT - ID 38 (an khánh): +96 bản ghi mới
+[2025-04-16 00:00:10] [✓] AQI - ID 38 (an khánh): +96 bản ghi mới
+[2025-04-16 00:00:10] [✓] STAT - ID 39 (vân hà): +96 bản ghi mới
+[2025-04-16 00:00:11] [✓] AQI - ID 39 (vân hà): +96 bản ghi mới
+[2025-04-16 00:00:12] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-04-16 00:00:12] ===== Kết thúc crawl =====
+
+[2025-04-18 00:00:03] [✓] STAT - ID 14 (số 46 lưu quang vũ): +288 bản ghi mới
+[2025-04-18 00:00:05] [✓] AQI - ID 14 (số 46 lưu quang vũ): +180 bản ghi mới
+[2025-04-18 00:00:06] [✓] STAT - ID 15 (minh khai bắc từ liêm): +288 bản ghi mới
+[2025-04-18 00:00:07] [✓] AQI - ID 15 (minh khai bắc từ liêm): +180 bản ghi mới
+[2025-04-18 00:00:08] [✓] STAT - ID 31 (đào duy từ): +192 bản ghi mới
+[2025-04-18 00:00:08] [✓] AQI - ID 31 (đào duy từ): +120 bản ghi mới
+[2025-04-18 00:00:09] [✓] STAT - ID 38 (an khánh): +192 bản ghi mới
+[2025-04-18 00:00:10] [✓] AQI - ID 38 (an khánh): +120 bản ghi mới
+[2025-04-18 00:00:10] [✓] STAT - ID 39 (vân hà): +192 bản ghi mới
+[2025-04-18 00:00:11] [✓] AQI - ID 39 (vân hà): +120 bản ghi mới
+[2025-04-18 00:00:11] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-04-18 00:00:11] ===== Kết thúc crawl =====
+
+[2025-04-19 00:00:03] [✓] STAT - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-04-19 00:00:05] [✓] AQI - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-04-19 00:00:06] [✓] STAT - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-04-19 00:00:08] [✓] AQI - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-04-19 00:00:09] [✓] STAT - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-04-19 00:00:10] [✓] AQI - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-04-19 00:00:10] [✓] STAT - ID 38 (an khánh): +96 bản ghi mới
+[2025-04-19 00:00:11] [✓] AQI - ID 38 (an khánh): +96 bản ghi mới
+[2025-04-19 00:00:12] [✓] STAT - ID 39 (vân hà): +96 bản ghi mới
+[2025-04-19 00:00:13] [✓] AQI - ID 39 (vân hà): +96 bản ghi mới
+[2025-04-19 00:00:13] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-04-19 00:00:13] ===== Kết thúc crawl =====
+
+[2025-04-20 00:00:02] [✓] STAT - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-04-20 00:00:04] [✓] AQI - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-04-20 00:00:05] [✓] STAT - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-04-20 00:00:07] [✓] AQI - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-04-20 00:00:08] [✓] STAT - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-04-20 00:00:09] [✓] AQI - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-04-20 00:00:09] [✓] STAT - ID 38 (an khánh): +96 bản ghi mới
+[2025-04-20 00:00:10] [✓] AQI - ID 38 (an khánh): +96 bản ghi mới
+[2025-04-20 00:00:11] [✓] STAT - ID 39 (vân hà): +96 bản ghi mới
+[2025-04-20 00:00:12] [✓] AQI - ID 39 (vân hà): +96 bản ghi mới
+[2025-04-20 00:00:12] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-04-20 00:00:12] ===== Kết thúc crawl =====
+
+[2025-04-24 00:00:03] [✓] STAT - ID 14 (số 46 lưu quang vũ): +576 bản ghi mới
+[2025-04-24 00:00:05] [✓] AQI - ID 14 (số 46 lưu quang vũ): +180 bản ghi mới
+[2025-04-24 00:00:06] [✓] STAT - ID 15 (minh khai bắc từ liêm): +576 bản ghi mới
+[2025-04-24 00:00:08] [✓] AQI - ID 15 (minh khai bắc từ liêm): +180 bản ghi mới
+[2025-04-24 00:00:09] [✓] STAT - ID 31 (đào duy từ): +384 bản ghi mới
+[2025-04-24 00:00:10] [✓] AQI - ID 31 (đào duy từ): +120 bản ghi mới
+[2025-04-24 00:00:11] [✓] STAT - ID 38 (an khánh): +384 bản ghi mới
+[2025-04-24 00:00:11] [✓] AQI - ID 38 (an khánh): +120 bản ghi mới
+[2025-04-24 00:00:12] [✓] STAT - ID 39 (vân hà): +384 bản ghi mới
+[2025-04-24 00:00:13] [✓] AQI - ID 39 (vân hà): +120 bản ghi mới
+[2025-04-24 00:00:13] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-04-24 00:00:13] ===== Kết thúc crawl =====
+
+[2025-04-25 00:00:02] [✓] STAT - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-04-25 00:00:04] [✓] AQI - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-04-25 00:00:05] [✓] STAT - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-04-25 00:00:08] [✓] AQI - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-04-25 00:00:08] [✓] STAT - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-04-25 00:00:09] [✓] AQI - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-04-25 00:00:10] [✓] STAT - ID 38 (an khánh): +96 bản ghi mới
+[2025-04-25 00:00:11] [✓] AQI - ID 38 (an khánh): +96 bản ghi mới
+[2025-04-25 00:00:12] [✓] STAT - ID 39 (vân hà): +96 bản ghi mới
+[2025-04-25 00:00:13] [✓] AQI - ID 39 (vân hà): +96 bản ghi mới
+[2025-04-25 00:00:13] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-04-25 00:00:13] ===== Kết thúc crawl =====
+
+[2025-04-26 00:00:03] [✓] STAT - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-04-26 00:00:04] [✓] AQI - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-04-26 00:00:06] [✓] STAT - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-04-26 00:00:08] [✓] AQI - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-04-26 00:00:08] [✓] STAT - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-04-26 00:00:09] [✓] AQI - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-04-26 00:00:10] [✓] STAT - ID 38 (an khánh): +96 bản ghi mới
+[2025-04-26 00:00:11] [✓] AQI - ID 38 (an khánh): +96 bản ghi mới
+[2025-04-26 00:00:12] [✓] STAT - ID 39 (vân hà): +96 bản ghi mới
+[2025-04-26 00:00:12] [✓] AQI - ID 39 (vân hà): +96 bản ghi mới
+[2025-04-26 00:00:13] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-04-26 00:00:13] ===== Kết thúc crawl =====
+
+[2025-04-28 20:49:33] [✓] STAT - ID 14 (số 46 lưu quang vũ): +96 bản ghi mới
+[2025-04-28 20:49:35] [✓] AQI - ID 14 (số 46 lưu quang vũ): +96 bản ghi mới
+[2025-04-28 20:49:36] [✓] STAT - ID 15 (minh khai bắc từ liêm): +96 bản ghi mới
+[2025-04-28 20:49:37] [✓] AQI - ID 15 (minh khai bắc từ liêm): +96 bản ghi mới
+[2025-04-28 20:49:38] [✓] STAT - ID 31 (đào duy từ): +60 bản ghi mới
+[2025-04-28 20:49:39] [✓] AQI - ID 31 (đào duy từ): +60 bản ghi mới
+[2025-04-28 20:49:39] [✓] STAT - ID 38 (an khánh): +60 bản ghi mới
+[2025-04-28 20:49:40] [✓] AQI - ID 38 (an khánh): +60 bản ghi mới
+[2025-04-28 20:49:40] [✓] STAT - ID 39 (vân hà): +60 bản ghi mới
+[2025-04-28 20:49:41] [✓] AQI - ID 39 (vân hà): +60 bản ghi mới
+[2025-04-28 20:49:41] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-04-28 20:49:41] ===== Kết thúc crawl =====
+
