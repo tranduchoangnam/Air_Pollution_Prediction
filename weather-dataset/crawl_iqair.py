@@ -22,7 +22,7 @@ def load_locations_from_csv(file_path: str) -> List[Dict[str, str]]:
     return locations
 
 # Lấy dữ liệu từ file location.csv
-file_path = 'location.csv'  
+file_path = 'weather-dataset/location.csv'  
 LOCATIONS = load_locations_from_csv(file_path)
 
 def get_vietnam_time():
