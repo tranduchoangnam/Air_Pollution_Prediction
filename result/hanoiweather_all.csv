@@ -2885,3 +2885,67 @@ timestamp,weather_icon,wind_speed,humidity,temperature,location
 2025-05-02T22:17:51+07:00,ic-w-10-night-clear-sky-full.svg,14.6 km/h,80%,77°,Tây Dằng
 2025-05-02T22:17:55+07:00,ic-w-11-night-few-clouds-full.svg,8.7 km/h,84%,77°,Đại Nghĩa
 2025-05-02T22:18:00+07:00,rain,16.1 km/h,78%,81°,Cầu Diễn
+2025-05-02T23:15:06+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,Phường Phú Thượng
+2025-05-02T23:15:11+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,"IQAir UNIS, Phuong Phu Thuong"
+2025-05-02T23:15:16+07:00,ic-w-10-night-clear-sky-full.svg,13.4 km/h,82%,79°,Hà Nội
+2025-05-02T23:15:20+07:00,partly-cloudy-day,2.7 km/h,89%,73°,"Minh Khai - Bắc Từ Liêm, Hà Nội"
+2025-05-02T23:15:25+07:00,ic-w-10-night-clear-sky-full.svg,14.0 km/h,82%,81°,"Hà Nội: Chi cục BVMT (KK), Hà Nội"
+2025-05-02T23:15:30+07:00,ic-w-10-night-clear-sky-full.svg,14.0 km/h,82%,81°,"Toa nha Charmvit, 117 D, Hà Nội"
+2025-05-02T23:15:35+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,"Academy Rd, Hà Nội"
+2025-05-02T23:15:40+07:00,ic-w-10-night-clear-sky-full.svg,13.7 km/h,80%,81°,"UDS Pharma - SmartCity, Hà Nội"
+2025-05-02T23:15:44+07:00,ic-w-10-night-clear-sky-full.svg,12.7 km/h,83%,79°,"Mipec Long Bien, Hà Nội"
+2025-05-02T23:15:49+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,"Hoangquocviet, Hà Nội"
+2025-05-02T23:15:54+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,"Khu do thi Ciputra, Hà Nội"
+2025-05-02T23:15:58+07:00,rain,11.7 km/h,85%,81°,"UDS Pharmacy - OceanPark1, Văn Giang"
+2025-05-02T23:16:03+07:00,ic-w-10-night-clear-sky-full.svg,12.4 km/h,84%,81°,"Cu Khoi, Long Bien, Hà Nội"
+2025-05-02T23:16:08+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,"LFAY - French School, Hà Nội"
+2025-05-02T23:16:31+07:00,ic-w-10-night-clear-sky-full.svg,13.0 km/h,83%,79°,Pho Lo Duc 2
+2025-05-02T23:16:35+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,Quang Ba-86TNV
+2025-05-02T23:16:40+07:00,ic-w-10-night-clear-sky-full.svg,11.6 km/h,85%,81°,"Vinhome riverside, HP7"
+2025-05-02T23:16:44+07:00,ic-w-10-night-clear-sky-full.svg,14.0 km/h,82%,81°,SmartOSC
+2025-05-02T23:16:49+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,Tu Hoa str.
+2025-05-02T23:16:53+07:00,ic-w-10-night-clear-sky-full.svg,13.0 km/h,83%,81°,Vinh Tuy - ThucPham.com - Vi Ngon Thuong Hang
+2025-05-02T23:16:57+07:00,ic-w-10-night-clear-sky-full.svg,13.4 km/h,82%,81°,Le Duan - Hoan Kiem
+2025-05-02T23:17:02+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,To Ngoc Van Tay Ho
+2025-05-02T23:17:06+07:00,ic-w-10-night-clear-sky-full.svg,13.7 km/h,83%,81°,Vivigo.vn
+2025-05-02T23:17:11+07:00,ic-w-10-night-clear-sky-full.svg,14.0 km/h,82%,81°,Me Tri - May Lam Da Hai Au - Hai Au Group
+2025-05-02T23:17:15+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,79°,Dang Tay Ho
+2025-05-02T23:17:19+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,Ciputra E5
+2025-05-02T23:17:24+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,"Quang Khanh, Tay Ho"
+2025-05-02T23:17:28+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,79°,IQAir Ha Noi
+2025-05-02T23:17:32+07:00,ic-w-10-night-clear-sky-full.svg,14.2 km/h,81%,81°,Hà Đông
+2025-05-02T23:17:37+07:00,ic-w-10-night-clear-sky-full.svg,14.2 km/h,81%,81°,ISPH School
+2025-05-02T23:18:13+07:00,ic-w-11-night-few-clouds-full.svg,9.5 km/h,82%,77°,Dong Truc
+2025-05-02T23:18:18+07:00,ic-w-10-night-clear-sky-full.svg,12.2 km/h,84%,81°,Hoàn Kiếm
+2025-05-02T23:18:22+07:00,ic-w-10-night-clear-sky-full.svg,12.7 km/h,83%,79°,Tran Hung Dao
+2025-05-02T23:18:27+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,Tây Hồ
+2025-05-02T23:18:31+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,65/50 Dang Thai Mai
+2025-05-02T23:18:36+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,26 Quang Khanh
+2025-05-02T23:18:40+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,B5 - Admin
+2025-05-02T23:18:44+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,B8 Library & Canteen
+2025-05-02T23:18:49+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,B6 - Admin
+2025-05-02T23:18:53+07:00,ic-w-10-night-clear-sky-full.svg,13.4 km/h,82%,79°,KT Home Sun S2A
+2025-05-02T23:18:57+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,P2 Ciputra Hanoi
+2025-05-02T23:19:01+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,P01 Ciputra
+2025-05-02T23:19:06+07:00,ic-w-10-night-clear-sky-full.svg,13.0 km/h,83%,81°,Hai Ba Trung 
+2025-05-02T23:19:10+07:00,ic-w-10-night-clear-sky-full.svg,12.7 km/h,83%,79°,Hà Nội: TT giao lưu văn hóa phố cổ - Hoàn Kiếm - Trạm cảm biến(KK)
+2025-05-02T23:19:14+07:00,ic-w-10-night-clear-sky-full.svg,13.7 km/h,83%,81°,Hà Nội: Đại Học Bách Khoa cổng Parabol đường Giải Phóng (KK)
+2025-05-02T23:19:17+07:00,ic-w-10-night-clear-sky-full.svg,14.0 km/h,82%,81°,Thanh Xuân
+2025-05-02T23:19:52+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,Đông Anh
+2025-05-02T23:19:56+07:00,ic-w-10-night-clear-sky-full.svg,12.6 km/h,80%,79°,Phùng
+2025-05-02T23:20:01+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,Trôi
+2025-05-02T23:20:05+07:00,ic-w-10-night-clear-sky-full.svg,13.4 km/h,82%,79°,Đống Đa
+2025-05-02T23:20:10+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,Mê Linh
+2025-05-02T23:20:14+07:00,ic-w-10-night-clear-sky-full.svg,11.6 km/h,81%,77°,Quốc Oai
+2025-05-02T23:20:19+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,79°,Sóc Sơn
+2025-05-02T23:20:24+07:00,ic-w-10-night-clear-sky-full.svg,11.7 km/h,85%,81°,Trâu Quỳ
+2025-05-02T23:20:28+07:00,ic-w-10-night-clear-sky-full.svg,10.3 km/h,81%,81°,Liên Quan
+2025-05-02T23:20:34+07:00,ic-w-10-night-clear-sky-full.svg,13.0 km/h,84%,77°,Văn Điển
+2025-05-02T23:20:38+07:00,ic-w-11-night-few-clouds-full.svg,12.6 km/h,82%,77°,Chúc Sơn
+2025-05-02T23:20:42+07:00,ic-w-10-night-clear-sky-full.svg,10.3 km/h,82%,77°,Phúc Thọ
+2025-05-02T23:20:47+07:00,rain,12.2 km/h,84%,77°,Kim Bài
+2025-05-02T23:20:51+07:00,ic-w-10-night-clear-sky-full.svg,10.5 km/h,82%,77°,Son Tay
+2025-05-02T23:20:55+07:00,ic-w-10-night-clear-sky-full.svg,12.4 km/h,85%,77°,Thường Tín
+2025-05-02T23:21:31+07:00,ic-w-10-night-clear-sky-full.svg,10.8 km/h,81%,77°,Tây Dằng
+2025-05-02T23:21:35+07:00,ic-w-11-night-few-clouds-full.svg,8.5 km/h,86%,75°,Đại Nghĩa
+2025-05-02T23:21:40+07:00,ic-w-10-night-clear-sky-full.svg,13.8 km/h,81%,81°,Cầu Diễn
