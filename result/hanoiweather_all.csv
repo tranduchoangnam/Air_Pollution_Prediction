@@ -2816,3 +2816,72 @@ timestamp,weather_icon,wind_speed,humidity,temperature,location
 2025-05-02T21:18:36+07:00,ic-w-10-night-clear-sky-full.svg,17.1 km/h,77%,79°,Tây Dằng
 2025-05-02T21:18:40+07:00,ic-w-11-night-few-clouds-full.svg,10.1 km/h,83%,77°,Đại Nghĩa
 2025-05-02T21:18:45+07:00,rain,17.2 km/h,77%,82°,Cầu Diễn
+2025-05-02T22:12:52+07:00,rain,14.8 km/h,78%,81°,Phường Phú Thượng
+2025-05-02T22:12:57+07:00,rain,14.8 km/h,78%,81°,"IQAir UNIS, Phuong Phu Thuong"
+2025-05-02T22:13:01+07:00,rain,15.4 km/h,80%,79°,Hà Nội
+2025-05-02T22:13:06+07:00,partly-cloudy-day,2.7 km/h,89%,73°,"Minh Khai - Bắc Từ Liêm, Hà Nội"
+2025-05-02T22:13:11+07:00,rain,15.8 km/h,79%,81°,"Hà Nội: Chi cục BVMT (KK), Hà Nội"
+2025-05-02T22:13:16+07:00,rain,15.8 km/h,79%,81°,"Toa nha Charmvit, 117 D, Hà Nội"
+2025-05-02T22:13:20+07:00,rain,14.8 km/h,78%,81°,"Academy Rd, Hà Nội"
+2025-05-02T22:13:25+07:00,rain,15.6 km/h,78%,81°,"UDS Pharma - SmartCity, Hà Nội"
+2025-05-02T22:13:30+07:00,rain,14.6 km/h,81%,79°,"Mipec Long Bien, Hà Nội"
+2025-05-02T22:13:34+07:00,rain,14.8 km/h,78%,81°,"Hoangquocviet, Hà Nội"
+2025-05-02T22:13:39+07:00,rain,14.8 km/h,78%,81°,"Khu do thi Ciputra, Hà Nội"
+2025-05-02T22:13:43+07:00,rain,13.0 km/h,83%,81°,"UDS Pharmacy - OceanPark1, Văn Giang"
+2025-05-02T22:13:47+07:00,rain,13.8 km/h,82%,81°,"Cu Khoi, Long Bien, Hà Nội"
+2025-05-02T22:13:52+07:00,rain,14.8 km/h,78%,81°,"LFAY - French School, Hà Nội"
+2025-05-02T22:13:56+07:00,rain,15.1 km/h,80%,81°,"Linh Dam - ThucPham.com - Vi Ngon Thuong Hang, Hà Nội"
+2025-05-02T22:14:01+07:00,rain,14.6 km/h,81%,79°,Pho Lo Duc 2
+2025-05-02T22:14:37+07:00,rain,15.8 km/h,79%,81°,SmartOSC
+2025-05-02T22:14:41+07:00,rain,14.8 km/h,78%,81°,Tu Hoa str.
+2025-05-02T22:14:47+07:00,rain,14.6 km/h,81%,81°,Vinh Tuy - ThucPham.com - Vi Ngon Thuong Hang
+2025-05-02T22:14:51+07:00,rain,15.4 km/h,80%,81°,Le Duan - Hoan Kiem
+2025-05-02T22:14:56+07:00,rain,14.8 km/h,78%,81°,To Ngoc Van Tay Ho
+2025-05-02T22:15:00+07:00,rain,15.4 km/h,80%,81°,Vivigo.vn
+2025-05-02T22:15:05+07:00,rain,15.8 km/h,79%,81°,Me Tri - May Lam Da Hai Au - Hai Au Group
+2025-05-02T22:15:10+07:00,rain,14.8 km/h,78%,79°,Dang Tay Ho
+2025-05-02T22:15:14+07:00,rain,14.8 km/h,78%,81°,Ciputra E5
+2025-05-02T22:15:18+07:00,rain,14.8 km/h,78%,81°,"Quang Khanh, Tay Ho"
+2025-05-02T22:15:23+07:00,rain,14.8 km/h,78%,79°,IQAir Ha Noi
+2025-05-02T22:15:28+07:00,rain,15.8 km/h,79%,81°,Hà Đông
+2025-05-02T22:15:32+07:00,rain,15.8 km/h,79%,81°,ISPH School
+2025-05-02T22:15:36+07:00,rain,15.3 km/h,79%,77°,KV - DAI HOC DAI NAM
+2025-05-02T22:15:41+07:00,ic-w-10-night-clear-sky-full.svg,9.8 km/h,82%,77°,Thach That
+2025-05-02T22:15:46+07:00,ic-w-10-night-clear-sky-full.svg,10.3 km/h,81%,77°,Dong Truc
+2025-05-02T22:15:50+07:00,rain,14.0 km/h,82%,81°,Hoàn Kiếm
+2025-05-02T22:15:55+07:00,rain,14.6 km/h,81%,79°,Tran Hung Dao
+2025-05-02T22:15:59+07:00,rain,14.8 km/h,78%,81°,Tây Hồ
+2025-05-02T22:16:04+07:00,rain,14.8 km/h,78%,81°,65/50 Dang Thai Mai
+2025-05-02T22:16:09+07:00,rain,14.8 km/h,78%,81°,26 Quang Khanh
+2025-05-02T22:16:13+07:00,rain,14.8 km/h,78%,81°,B5 - Admin
+2025-05-02T22:16:18+07:00,rain,14.8 km/h,78%,81°,B8 Library & Canteen
+2025-05-02T22:16:22+07:00,rain,14.8 km/h,78%,81°,B6 - Admin
+2025-05-02T22:16:26+07:00,rain,15.4 km/h,80%,79°,KT Home Sun S2A
+2025-05-02T22:16:31+07:00,rain,14.8 km/h,78%,81°,P2 Ciputra Hanoi
+2025-05-02T22:16:35+07:00,rain,14.8 km/h,78%,81°,P01 Ciputra
+2025-05-02T22:16:37+07:00,rain,14.6 km/h,81%,81°,Hai Ba Trung 
+2025-05-02T22:16:40+07:00,rain,14.6 km/h,81%,79°,Hà Nội: TT giao lưu văn hóa phố cổ - Hoàn Kiếm - Trạm cảm biến(KK)
+2025-05-02T22:16:42+07:00,rain,15.4 km/h,80%,81°,Hà Nội: Đại Học Bách Khoa cổng Parabol đường Giải Phóng (KK)
+2025-05-02T22:16:44+07:00,rain,15.8 km/h,79%,81°,Thanh Xuân
+2025-05-02T22:16:47+07:00,rain,15.8 km/h,79%,81°,Hà Nội: Công viên hồ điều hòa Nhân Chính  Khuất Duy Tiến (KK)
+2025-05-02T22:16:49+07:00,rain,15.9 km/h,79%,81°,Cầu Giấy
+2025-05-02T22:16:52+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,Đông Anh
+2025-05-02T22:16:54+07:00,ic-w-10-night-clear-sky-full.svg,15.6 km/h,79%,79°,Phùng
+2025-05-02T22:16:56+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,Trôi
+2025-05-02T22:16:59+07:00,rain,15.4 km/h,80%,79°,Đống Đa
+2025-05-02T22:17:01+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,81°,Mê Linh
+2025-05-02T22:17:04+07:00,ic-w-10-night-clear-sky-full.svg,13.2 km/h,80%,77°,Quốc Oai
+2025-05-02T22:17:06+07:00,ic-w-10-night-clear-sky-full.svg,14.8 km/h,78%,79°,Sóc Sơn
+2025-05-02T22:17:09+07:00,rain,13.0 km/h,83%,81°,Trâu Quỳ
+2025-05-02T22:17:12+07:00,ic-w-10-night-clear-sky-full.svg,12.7 km/h,80%,81°,Liên Quan
+2025-05-02T22:17:16+07:00,rain,14.0 km/h,82%,77°,Văn Điển
+2025-05-02T22:17:20+07:00,rain,13.5 km/h,80%,77°,Chúc Sơn
+2025-05-02T22:17:25+07:00,ic-w-10-night-clear-sky-full.svg,13.2 km/h,80%,77°,Phúc Thọ
+2025-05-02T22:17:29+07:00,rain,12.7 km/h,82%,77°,Kim Bài
+2025-05-02T22:17:33+07:00,ic-w-10-night-clear-sky-full.svg,13.8 km/h,80%,77°,Son Tay
+2025-05-02T22:17:38+07:00,rain,12.7 km/h,83%,77°,Thường Tín
+2025-05-02T22:17:42+07:00,rain,8.9 km/h,86%,77°,Phú Xuyên
+2025-05-02T22:17:47+07:00,rain,9.3 km/h,84%,77°,Vân Đình
+2025-05-02T22:17:51+07:00,ic-w-10-night-clear-sky-full.svg,14.6 km/h,80%,77°,Tây Dằng
+2025-05-02T22:17:55+07:00,ic-w-11-night-few-clouds-full.svg,8.7 km/h,84%,77°,Đại Nghĩa
+2025-05-02T22:18:00+07:00,rain,16.1 km/h,78%,81°,Cầu Diễn
