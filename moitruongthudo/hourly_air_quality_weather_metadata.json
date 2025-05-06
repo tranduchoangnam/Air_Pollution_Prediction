@@ -1,0 +1,13 @@
+{
+  "generated_on": "2025-05-05 23:13:13",
+  "num_records": 96,
+  "time_range": "2025-05-01 00:00:00 to 2025-05-04 23:00:00",
+  "locations": "Hanoi",
+  "processing_steps": [
+    "Extracted air quality data from TimescaleDB with station-level granularity",
+    "Loaded weather data from CSV and set all locations to \"Hanoi\"",
+    "Calculated AQI values for all pollutants",
+    "Merged datasets by timestamp",
+    "Resampled to hourly frequency with linear interpolation"
+  ]
+}
