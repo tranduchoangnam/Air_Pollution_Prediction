@@ -90,32 +90,6 @@ def validate_humidity(humidity: str) -> Optional[str]:
     return None
 
 def validate_temperature(temp: str) -> Optional[str]:
-    """Validate temperature and convert to Celsius if needed"""
-    try:
-        temp = temp.strip()
-        # Check for Celsius pattern (e.g., "28°C" or "28 °C")
-        celsius_match = re.search(r'(\d+)\s*°?\s*C', temp, re.IGNORECASE)
-        if celsius_match:
-            return f"{celsius_match.group(1)}°C"
-        
-        # Check for Fahrenheit pattern (e.g., "83°F" or "83 °F")
-        fahrenheit_match = re.search(r'(\d+)\s*°?\s*F', temp, re.IGNORECASE)
-        if fahrenheit_match:
-            # Convert to Celsius: C = (F - 32) * 5/9
-            f_value = int(fahrenheit_match.group(1))
-            c_value = round((f_value - 32) * 5/9)
-            return f"{c_value}°C"
-        
-        # If just number without unit
-        if re.match(r'^\d+$', temp):
-            return f"{temp}°C"
-            
-    except (ValueError, TypeError, AttributeError):
-        pass
-    return None
-
-
-def validate_temperature(temp: str) -> Optional[str]:
     """Validate and convert temperature to Celsius"""
     try:
         temp = temp.strip()
