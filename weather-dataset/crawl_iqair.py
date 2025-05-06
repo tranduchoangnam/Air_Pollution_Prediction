@@ -75,6 +75,57 @@ def validate_humidity(humidity: str) -> Optional[str]:
         pass
     return None
 
+def validate_temperature(temp: str) -> Optional[str]:
+    """Validate temperature and convert to Celsius if needed"""
+    try:
+        temp = temp.strip()
+        # Check for Celsius pattern (e.g., "28°C" or "28 °C")
+        celsius_match = re.search(r'(\d+)\s*°?\s*C', temp, re.IGNORECASE)
+        if celsius_match:
+            return f"{celsius_match.group(1)}°C"
+        
+        # Check for Fahrenheit pattern (e.g., "83°F" or "83 °F")
+        fahrenheit_match = re.search(r'(\d+)\s*°?\s*F', temp, re.IGNORECASE)
+        if fahrenheit_match:
+            # Convert to Celsius: C = (F - 32) * 5/9
+            f_value = int(fahrenheit_match.group(1))
+            c_value = round((f_value - 32) * 5/9)
+            return f"{c_value}°C"
+        
+        # If just number without unit
+        if re.match(r'^\d+$', temp):
+            return f"{temp}°C"
+            
+    except (ValueError, TypeError, AttributeError):
+        pass
+    return None
+
+
+def validate_temperature(temp: str) -> Optional[str]:
+    """Validate and convert temperature to Celsius"""
+    try:
+        temp = temp.strip()
+        print(f"Raw temperature: {temp}")  # Debug log
+        
+        # Extract numeric value and unit
+        match = re.search(r'(\d+)\s*°?\s*([CF])?', temp, re.IGNORECASE)
+        if not match:
+            return None
+            
+        value = int(match.group(1))
+        unit = match.group(2).upper() if match.group(2) else None
+        
+        # Convert to Celsius if needed
+        if unit == 'F' or (unit is None and value > 50):  # Assume F if >50 and no unit
+            celsius = round((value - 32) * 5/9)
+            return f"{celsius}°C"
+        
+        return f"{value}°C"
+        
+    except Exception as e:
+        print(f"Temperature validation error: {str(e)}")
+        return None
+
 def crawl_location_data(page, location: Dict) -> Optional[Dict]:
     """Crawl data for a specific location"""
     print(f"\nAccessing {location['name']} ({location['url']})...")
@@ -98,7 +149,7 @@ def crawl_location_data(page, location: Dict) -> Optional[Dict]:
         weather_icon = validate_weather_icon(weather_icon_raw)
         wind_speed = validate_wind_speed(wind_speed_raw)
         humidity = validate_humidity(humidity_raw)
-        temperature = temperature_raw.strip() if temperature_raw else None  # Extract temperature
+        temperature = temperature = validate_temperature(temperature_raw)
         
         # If any validation fails, return None
         if not all([weather_icon, wind_speed, humidity, temperature]):
