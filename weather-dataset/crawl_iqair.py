@@ -129,7 +129,7 @@ def crawl_location_data(page, location: Dict) -> Optional[Dict]:
 def save_to_csv(data: Dict, location_name: str):
     """Save data to CSV file for a specific location"""
     now = get_vietnam_time()
-    result_dir = pathlib.Path(f"result")
+    result_dir = pathlib.Path(f"weather-dataset/result")
     result_dir.mkdir(parents=True, exist_ok=True)
     
     # Create filename based on current month
