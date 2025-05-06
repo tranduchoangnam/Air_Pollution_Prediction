@@ -31,19 +31,33 @@ def get_vietnam_time():
 
 def validate_weather_icon(icon: str) -> Optional[str]:
     """Validate weather icon URL and convert it to a readable description"""
-    if icon and isinstance(icon, str) and icon.startswith('/dl/web/weather/'):
-        icon_filename = icon.split('/')[-1]  # Extract the icon filename
-        # Map icon filenames to readable descriptions
+    if icon and isinstance(icon, str):
+        icon_filename = icon.split('/')[-1]  # Extract the filename if it's a path
+
+        # Mapping from icon filenames to readable descriptions
         icon_mapping = {
-            "ic-w-12-night-rain-full.svg": "rain",
-            "ic-w-04-scattered-clouds-full.svg": "partly-cloudy-day",
-            "ic-w-09-mist-full.svg": "mist",
-            "ic-w-03-cloudy-full.svg": "cloudy",
+            "ic-w-01-clear-sky-full.svg": "clear-day",
             "ic-w-01-clear-day-full.svg": "clear-day",
+            "ic-w-02-new-clouds-full.svg": "partly-cloudy-day",
             "ic-w-02-wind-full.svg": "wind",
-            # Add more mappings as necessary
+            "ic-w-03-cloudy-full.svg": "cloudy",
+            "ic-w-04-scattered-clouds-full.svg": "partly-cloudy-day",
+            "ic-w-06-rain-full.svg": "rain",
+            "ic-w-07-thunderstorms-full.svg": "thunderstorm",
+            "ic-w-09-mist-full.svg": "mist",
+            "ic-w-10-night-clear-sky-full.svg": "clear-night",
+            "ic-w-11-night-few-clouds-full.svg": "partly-cloudy-night",
+            "ic-w-12-night-rain-full.svg": "rain",
+
+            # fallback for existing readable descriptions already in data
+            "partly-cloudy-day": "partly-cloudy-day",
+            "rain": "rain",
+            "cloudy": "cloudy",
+            "mist": "mist",
+            "wind": "wind",
+            "clear-day": "clear-day"
         }
-        # Return the corresponding description or the filename itself if not found
+
         return icon_mapping.get(icon_filename, icon_filename)
     return None
 
