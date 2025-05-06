@@ -137,7 +137,7 @@ def crawl_location_data(page, location: Dict) -> Optional[Dict]:
         weather_icon = validate_weather_icon(weather_icon_raw)
         wind_speed = validate_wind_speed(wind_speed_raw)
         humidity = validate_humidity(humidity_raw)
-        temperature = temperature = validate_temperature(temperature_raw)
+        temperature = validate_temperature(temperature_raw)
         
         # If any validation fails, return None
         if not all([weather_icon, wind_speed, humidity, temperature]):
