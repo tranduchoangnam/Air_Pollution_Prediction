@@ -500,3 +500,98 @@
 [2025-05-06 00:00:15] [✔] Đã thêm 486 bản ghi mới vào TimescaleDB
 [2025-05-06 00:00:15] ===== Kết thúc crawl =====
 
+[2025-05-08 00:00:03] ===== Bắt đầu crawl =====
+[2025-05-08 00:00:05] [✓] AQI - ID 39 (vân hà): +120 bản ghi mới
+[2025-05-08 00:00:06] [✓] STAT - ID 38 (an khánh): +192 bản ghi mới
+[2025-05-08 00:00:06] [✓] STAT - ID 39 (vân hà): +192 bản ghi mới
+[2025-05-08 00:00:07] [✓] AQI - ID 38 (an khánh): +120 bản ghi mới
+[2025-05-08 00:00:07] [✓] STAT - ID 31 (đào duy từ): +192 bản ghi mới
+[2025-05-08 00:00:07] [✓] AQI - ID 31 (đào duy từ): +120 bản ghi mới
+[2025-05-08 00:00:07] [✓] AQI - ID 14 (số 46 lưu quang vũ): +180 bản ghi mới
+[2025-05-08 00:00:07] [✓] STAT - ID 14 (số 46 lưu quang vũ): +282 bản ghi mới
+[2025-05-08 00:00:08] [✓] STAT - ID 15 (minh khai bắc từ liêm): +282 bản ghi mới
+[2025-05-08 00:00:08] [✓] AQI - ID 15 (minh khai bắc từ liêm): +180 bản ghi mới
+[2025-05-08 00:00:09] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-05-08 00:00:09] [ℹ] Chuyển đổi dữ liệu cho TimescaleDB...
+[2025-05-08 00:00:09] [ℹ] Chuẩn bị thêm 388 bản ghi vào TimescaleDB...
+[2025-05-08 00:00:11] [ℹ] Kiểm tra các bản ghi đã tồn tại...
+[2025-05-08 00:00:13] [✓] Đã thêm 387/387 bản ghi vào TimescaleDB
+[2025-05-08 00:00:13] [✔] Đã thêm 387 bản ghi mới vào TimescaleDB
+[2025-05-08 00:00:13] ===== Kết thúc crawl =====
+
+[2025-05-09 00:00:03] ===== Bắt đầu crawl =====
+[2025-05-09 00:00:05] [✓] STAT - ID 38 (an khánh): +96 bản ghi mới
+[2025-05-09 00:00:05] [✓] AQI - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-05-09 00:00:05] [✓] STAT - ID 39 (vân hà): +96 bản ghi mới
+[2025-05-09 00:00:06] [✓] AQI - ID 38 (an khánh): +96 bản ghi mới
+[2025-05-09 00:00:06] [✓] AQI - ID 39 (vân hà): +96 bản ghi mới
+[2025-05-09 00:00:07] [✓] STAT - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-05-09 00:00:07] [✓] AQI - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-05-09 00:00:07] [✓] STAT - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-05-09 00:00:07] [✓] AQI - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-05-09 00:00:08] [✓] STAT - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-05-09 00:00:09] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-05-09 00:00:09] [ℹ] Chuyển đổi dữ liệu cho TimescaleDB...
+[2025-05-09 00:00:09] [ℹ] Chuẩn bị thêm 240 bản ghi vào TimescaleDB...
+[2025-05-09 00:00:11] [ℹ] Kiểm tra các bản ghi đã tồn tại...
+[2025-05-09 00:00:12] [✓] Đã thêm 239/239 bản ghi vào TimescaleDB
+[2025-05-09 00:00:12] [✔] Đã thêm 239 bản ghi mới vào TimescaleDB
+[2025-05-09 00:00:12] ===== Kết thúc crawl =====
+
+[2025-05-10 00:00:07] ===== Bắt đầu crawl =====
+[2025-05-10 00:00:09] [✓] AQI - ID 39 (vân hà): +96 bản ghi mới
+[2025-05-10 00:00:10] [✓] AQI - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-05-10 00:00:10] [✓] AQI - ID 38 (an khánh): +96 bản ghi mới
+[2025-05-10 00:00:11] [✓] AQI - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-05-10 00:00:12] [✓] AQI - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-05-10 00:00:12] [✓] STAT - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-05-10 00:00:12] [✓] STAT - ID 38 (an khánh): +96 bản ghi mới
+[2025-05-10 00:00:13] [✓] STAT - ID 39 (vân hà): +96 bản ghi mới
+[2025-05-10 00:00:13] [✓] STAT - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-05-10 00:00:13] [✓] STAT - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-05-10 00:00:14] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-05-10 00:00:14] [ℹ] Chuyển đổi dữ liệu cho TimescaleDB...
+[2025-05-10 00:00:14] [ℹ] Chuẩn bị thêm 240 bản ghi vào TimescaleDB...
+[2025-05-10 00:00:16] [ℹ] Kiểm tra các bản ghi đã tồn tại...
+[2025-05-10 00:00:20] [✓] Đã thêm 239/239 bản ghi vào TimescaleDB
+[2025-05-10 00:00:20] [✔] Đã thêm 239 bản ghi mới vào TimescaleDB
+[2025-05-10 00:00:20] ===== Kết thúc crawl =====
+
+[2025-05-11 00:00:03] ===== Bắt đầu crawl =====
+[2025-05-11 00:00:05] [✓] AQI - ID 31 (đào duy từ): +92 bản ghi mới
+[2025-05-11 00:00:05] [✓] AQI - ID 38 (an khánh): +96 bản ghi mới
+[2025-05-11 00:00:06] [✓] STAT - ID 38 (an khánh): +96 bản ghi mới
+[2025-05-11 00:00:07] [✓] STAT - ID 39 (vân hà): +96 bản ghi mới
+[2025-05-11 00:00:07] [✓] AQI - ID 39 (vân hà): +96 bản ghi mới
+[2025-05-11 00:00:08] [✓] STAT - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-05-11 00:00:08] [✓] AQI - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-05-11 00:00:08] [✓] STAT - ID 31 (đào duy từ): +92 bản ghi mới
+[2025-05-11 00:00:08] [✓] STAT - ID 15 (minh khai bắc từ liêm): +144 bản ghi mới
+[2025-05-11 00:00:09] [✓] AQI - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-05-11 00:00:09] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-05-11 00:00:09] [ℹ] Chuyển đổi dữ liệu cho TimescaleDB...
+[2025-05-11 00:00:09] [ℹ] Chuẩn bị thêm 238 bản ghi vào TimescaleDB...
+[2025-05-11 00:00:12] [ℹ] Kiểm tra các bản ghi đã tồn tại...
+[2025-05-11 00:00:13] [✓] Đã thêm 237/237 bản ghi vào TimescaleDB
+[2025-05-11 00:00:13] [✔] Đã thêm 237 bản ghi mới vào TimescaleDB
+[2025-05-11 00:00:13] ===== Kết thúc crawl =====
+
+[2025-05-12 00:00:04] ===== Bắt đầu crawl =====
+[2025-05-12 00:00:06] [✓] AQI - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-05-12 00:00:06] [✓] AQI - ID 38 (an khánh): +96 bản ghi mới
+[2025-05-12 00:00:06] [✓] STAT - ID 39 (vân hà): +96 bản ghi mới
+[2025-05-12 00:00:07] [✓] STAT - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-05-12 00:00:07] [✓] AQI - ID 15 (minh khai bắc từ liêm): +132 bản ghi mới
+[2025-05-12 00:00:07] [✓] AQI - ID 39 (vân hà): +96 bản ghi mới
+[2025-05-12 00:00:08] [✓] STAT - ID 38 (an khánh): +96 bản ghi mới
+[2025-05-12 00:00:09] [✓] AQI - ID 14 (số 46 lưu quang vũ): +144 bản ghi mới
+[2025-05-12 00:00:09] [✓] STAT - ID 31 (đào duy từ): +96 bản ghi mới
+[2025-05-12 00:00:09] [✓] STAT - ID 15 (minh khai bắc từ liêm): +132 bản ghi mới
+[2025-05-12 00:00:10] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-05-12 00:00:10] [ℹ] Chuyển đổi dữ liệu cho TimescaleDB...
+[2025-05-12 00:00:10] [ℹ] Chuẩn bị thêm 236 bản ghi vào TimescaleDB...
+[2025-05-12 00:00:12] [ℹ] Kiểm tra các bản ghi đã tồn tại...
+[2025-05-12 00:00:14] [✓] Đã thêm 235/235 bản ghi vào TimescaleDB
+[2025-05-12 00:00:14] [✔] Đã thêm 235 bản ghi mới vào TimescaleDB
+[2025-05-12 00:00:14] ===== Kết thúc crawl =====
+
