@@ -1,8 +1,8 @@
 {
-  "generated_on": "2025-05-05 23:13:13",
-  "num_records": 96,
-  "time_range": "2025-05-01 00:00:00 to 2025-05-04 23:00:00",
-  "locations": "Hanoi",
+  "generated_on": "2025-05-12 18:43:02",
+  "num_records": 7920,
+  "time_range": "2025-03-07 00:00:00 to 2025-05-11 23:00:00",
+  "locations": "46 L\u01b0u Quang V\u0169, An Kh\u00e1nh, Minh Khai - B\u1eafc T\u1eeb Li\u00eam, V\u00e2n H\u00e0, \u0110\u00e0o Duy T\u1eeb",
   "processing_steps": [
     "Extracted air quality data from TimescaleDB with station-level granularity",
     "Loaded weather data from CSV and set all locations to \"Hanoi\"",

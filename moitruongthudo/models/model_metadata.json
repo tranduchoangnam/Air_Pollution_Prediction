@@ -1,0 +1,217 @@
+{
+  "saved_on": "2025-05-12 18:43:23",
+  "models": [
+    "Linear Regression",
+    "Ridge Regression",
+    "Random Forest",
+    "Gradient Boosting",
+    "XGBoost"
+  ],
+  "model_metrics": [
+    {
+      "model": "Linear Regression",
+      "mae": 1.9182960422085992e-11,
+      "rmse": 2.4397878662334513e-11,
+      "r2": 1.0,
+      "mape": 2.3128177225809408e-11,
+      "category_accuracy": 99.08062234794907,
+      "directional_accuracy": 99.00920028308563,
+      "category_errors": {
+        "Good": {
+          "count": "116",
+          "mae": 1.4383038821255594e-11,
+          "rmse": 1.845203612490239e-11
+        },
+        "Hazardous": {
+          "count": "5",
+          "mae": 2.9103830456733705e-12,
+          "rmse": 4.156804964682428e-12
+        },
+        "Moderate": {
+          "count": "832",
+          "mae": 1.947107432552177e-11,
+          "rmse": 2.5220238547795753e-11
+        },
+        "Unhealthy": {
+          "count": "123",
+          "mae": 1.789504768396917e-11,
+          "rmse": 2.187261410768343e-11
+        },
+        "Unhealthy for Sensitive Groups": {
+          "count": "326",
+          "mae": 2.1135420612025788e-11,
+          "rmse": 2.5467334364789325e-11
+        },
+        "Very Unhealthy": {
+          "count": "12",
+          "mae": 1.2545816237737503e-11,
+          "rmse": 1.4790914913593078e-11
+        }
+      }
+    },
+    {
+      "model": "Ridge Regression",
+      "mae": 2.584017622185727,
+      "rmse": 3.303342304074636,
+      "r2": 0.9942625176173436,
+      "mape": 3.1736302468969213,
+      "category_accuracy": 93.28147100424327,
+      "directional_accuracy": 98.86765746638359,
+      "category_errors": {
+        "Good": {
+          "count": "116",
+          "mae": 2.397084977240478,
+          "rmse": 2.962144192643886
+        },
+        "Hazardous": {
+          "count": "5",
+          "mae": 0.6216973040366269,
+          "rmse": 0.8097405739283008
+        },
+        "Moderate": {
+          "count": "832",
+          "mae": 2.5754242494510606,
+          "rmse": 3.381204991540339
+        },
+        "Unhealthy": {
+          "count": "123",
+          "mae": 2.4733701075004,
+          "rmse": 3.0403087403309685
+        },
+        "Unhealthy for Sensitive Groups": {
+          "count": "326",
+          "mae": 2.767002852713995,
+          "rmse": 3.3613766496053934
+        },
+        "Very Unhealthy": {
+          "count": "12",
+          "mae": 1.9675120949955154,
+          "rmse": 2.521862476948724
+        }
+      }
+    },
+    {
+      "model": "Random Forest",
+      "mae": 2.7933061090245452,
+      "rmse": 13.85649174121573,
+      "r2": 0.8990466392591219,
+      "mape": 1.8377244793016785,
+      "category_accuracy": 95.61527581329563,
+      "directional_accuracy": 98.01840056617127,
+      "category_errors": {
+        "Good": {
+          "count": "116",
+          "mae": 15.843433384522312,
+          "rmse": 34.149636921626495
+        },
+        "Hazardous": {
+          "count": "5",
+          "mae": 148.32666666666668,
+          "rmse": 155.26409843303193
+        },
+        "Moderate": {
+          "count": "832",
+          "mae": 0.7949899760639975,
+          "rmse": 2.170002824162288
+        },
+        "Unhealthy": {
+          "count": "123",
+          "mae": 3.0932131689448745,
+          "rmse": 7.182467711302985
+        },
+        "Unhealthy for Sensitive Groups": {
+          "count": "326",
+          "mae": 0.3677393221594689,
+          "rmse": 1.036626275365773
+        },
+        "Very Unhealthy": {
+          "count": "12",
+          "mae": 17.373611111111103,
+          "rmse": 20.543185835192627
+        }
+      }
+    },
+    {
+      "model": "Gradient Boosting",
+      "mae": 4.175755540819595,
+      "rmse": 14.732451028728645,
+      "r2": 0.8858793546270197,
+      "mape": 4.582131664424397,
+      "category_accuracy": 94.41301272984441,
+      "directional_accuracy": 95.54140127388536,
+      "category_errors": {
+        "Good": {
+          "count": "116",
+          "mae": 10.869575480393483,
+          "rmse": 22.223043709981688
+        },
+        "Hazardous": {
+          "count": "5",
+          "mae": 182.93850703772904,
+          "rmse": 202.94277049094285
+        },
+        "Moderate": {
+          "count": "832",
+          "mae": 2.6776006443795817,
+          "rmse": 3.9029645618540436
+        },
+        "Unhealthy": {
+          "count": "123",
+          "mae": 5.9227831602709395,
+          "rmse": 12.73682476740837
+        },
+        "Unhealthy for Sensitive Groups": {
+          "count": "326",
+          "mae": 1.7652175570908408,
+          "rmse": 3.5414144302847133
+        },
+        "Very Unhealthy": {
+          "count": "12",
+          "mae": 16.43567127965541,
+          "rmse": 24.097624527547318
+        }
+      }
+    },
+    {
+      "model": "XGBoost",
+      "mae": 2.9907212930412457,
+      "rmse": 19.402883670468444,
+      "r2": 0.8020539834536022,
+      "mape": 2.6116422149216563,
+      "category_accuracy": 96.46393210749646,
+      "directional_accuracy": 97.73531493276715,
+      "category_errors": {
+        "Good": {
+          "count": "116",
+          "mae": 4.833488428561282,
+          "rmse": 16.504753298868575
+        },
+        "Hazardous": {
+          "count": "5",
+          "mae": 286.02486063639327,
+          "rmse": 295.97200009647133
+        },
+        "Moderate": {
+          "count": "832",
+          "mae": 1.2298590118411095,
+          "rmse": 2.181458619240035
+        },
+        "Unhealthy": {
+          "count": "123",
+          "mae": 3.739356870573711,
+          "rmse": 11.569171824544767
+        },
+        "Unhealthy for Sensitive Groups": {
+          "count": "326",
+          "mae": 0.8466554887455665,
+          "rmse": 1.4649019787524926
+        },
+        "Very Unhealthy": {
+          "count": "12",
+          "mae": 39.90647210015191,
+          "rmse": 58.8876370816608
+        }
+      }
+    }
+  ]
+}
