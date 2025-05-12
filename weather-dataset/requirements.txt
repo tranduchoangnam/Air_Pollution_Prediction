@@ -1,2 +1,5 @@
 playwright==1.41.0
 python-dotenv==1.0.0
+pandas==2.2.1
+sqlalchemy==2.0.28
+psycopg2-binary==2.9.9
