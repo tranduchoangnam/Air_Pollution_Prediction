@@ -7,6 +7,12 @@ import pathlib
 from zoneinfo import ZoneInfo
 from typing import Dict, List, Optional
 import re
+import pandas as pd
+import sys
+
+# Add the parent directory to path to import utils
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils.timescaledb_util import TimescaleDBUtil
 
 # Đọc dữ liệu từ file location.csv
 def load_locations_from_csv(file_path: str) -> List[Dict[str, str]]:
@@ -166,7 +172,7 @@ def crawl_location_data(page, location: Dict) -> Optional[Dict]:
         return None
 
 def save_to_csv(data: Dict, location_name: str):
-    """Save data to CSV file for a specific location"""
+    """Save data to CSV file for a specific location and push to TimescaleDB"""
     now = get_vietnam_time()
     result_dir = pathlib.Path(f"weather-dataset/result")
     result_dir.mkdir(parents=True, exist_ok=True)
@@ -190,6 +196,71 @@ def save_to_csv(data: Dict, location_name: str):
         
         # Write data
         writer.writerow(data)
+        print(f"Data saved to CSV: {data}")
+    
+    # Push new data to TimescaleDB
+    try:
+        print("\nAttempting to connect to TimescaleDB...")
+        # Initialize TimescaleDB connection
+        db_url = 'postgres://tsdbadmin:lnmfese700b796cn@gejinnsvx3.aqgqm1fn3z.tsdb.cloud.timescale.com:35582/tsdb?sslmode=require'
+        db_util = TimescaleDBUtil(db_url=db_url)
+        
+        # Convert single record to DataFrame
+        df = pd.DataFrame([data])
+        print(f"DataFrame created: {df}")
+        
+        # Preprocess the data
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['wind_speed'] = df['wind_speed'].str.replace(' km/h', '').astype(float)
+        df['humidity'] = df['humidity'].str.replace('%', '').astype(float)
+        # Fix temperature conversion
+        df['temperature'] = df['temperature'].str.replace('°C', '').str.replace('°', '').astype(float)
+        print(f"Data preprocessed: {df}")
+        
+        # Check if table exists
+        print("Checking if table exists...")
+        table_exists = db_util.execute_query(
+            "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'hanoi_weather_data')"
+        ).iloc[0, 0]
+        print(f"Table exists: {table_exists}")
+        
+        if not table_exists:
+            print("Creating new table...")
+            # Create new table if it doesn't exist
+            success = db_util.create_table_from_dataframe(
+                df=df,
+                table_name='hanoi_weather_data',
+                time_column='timestamp',
+                schema='public',
+                if_exists='replace'
+            )
+        else:
+            print("Inserting data into existing table...")
+            # Insert new data into existing table
+            success = db_util.insert_dataframe(
+                df=df,
+                table_name='hanoi_weather_data',
+                schema='public',
+                if_exists='append'
+            )
+        
+        if success:
+            print(f"Successfully pushed new data to TimescaleDB at {now}")
+            # Verify the data was inserted
+            verify_query = f"""
+            SELECT * FROM hanoi_weather_data 
+            WHERE timestamp = '{data['timestamp']}'
+            AND location = '{data['location']}'
+            """
+            result = db_util.execute_query(verify_query)
+            print(f"Verification query result: {result}")
+        else:
+            print(f"Failed to push new data to TimescaleDB at {now}")
+            
+    except Exception as e:
+        print(f"Error pushing to database: {str(e)}")
+        import traceback
+        print(f"Full error traceback: {traceback.format_exc()}")
     
     return filepath
 
