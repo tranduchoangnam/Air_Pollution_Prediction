@@ -9,6 +9,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
 
 # Kết nối database
 def get_db_connection():
@@ -23,7 +25,7 @@ SELECT timestamp, city, state, country,
        temperature, pressure, humidity,
        wind_speed, wind_direction, weather_icon
 FROM merge
-WHERE city = 'Hanoi'
+WHERE state = 'Hanoi'
 ORDER BY timestamp DESC
 """
 df = pd.read_sql(query, engine)
@@ -39,33 +41,77 @@ st.write(latest_data)
 # Biểu đồ thời gian
 st.subheader("Biến động các chỉ số theo thời gian")
 
-cols_to_plot = ['PM2.5', 'PM10', 'NO2', 'CO', 'SO2', 'O3']
-for col in cols_to_plot:
-    st.line_chart(df.set_index('timestamp')[col])
+# Kiểm tra và hiển thị dữ liệu cho từng chỉ số
+for col in ['PM2.5', 'PM10', 'NO2', 'CO', 'SO2', 'O3']:
+    if col in df.columns:
+        # Lấy dữ liệu và sắp xếp theo thời gian
+        data = df[['timestamp', col]].dropna().sort_values('timestamp')
+        if not data.empty:
+            st.write(f"Biểu đồ {col}")
+            # Vẽ biểu đồ tương tác với Plotly
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(
+                x=data['timestamp'],
+                y=data[col],
+                mode='lines+markers',
+                name=col,
+                hovertemplate="<b>Thời gian:</b> %{x}<br>" +
+                            "<b>Giá trị:</b> %{y}<br>" +
+                            "<extra></extra>"
+            ))
+            
+            fig.update_layout(
+                title=f'Biến động {col} theo thời gian',
+                xaxis_title='Thời gian',
+                yaxis_title=col,
+                hovermode='x unified',
+                showlegend=True
+            )
+            
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.warning(f"Không có dữ liệu cho chỉ số {col}")
+    else:
+        st.warning(f"Không tìm thấy cột {col} trong dữ liệu")
 
 # Thời tiết & nhiệt độ
 st.subheader("Thời tiết và nhiệt độ")
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.line_chart(df.set_index('timestamp')['temperature'])
+    fig_temp = px.line(df, x='timestamp', y='temperature', 
+                      title='Nhiệt độ',
+                      labels={'timestamp': 'Thời gian', 'temperature': 'Nhiệt độ (°C)'})
+    st.plotly_chart(fig_temp, use_container_width=True)
 with col2:
-    st.line_chart(df.set_index('timestamp')['humidity'])
+    fig_humid = px.line(df, x='timestamp', y='humidity',
+                       title='Độ ẩm',
+                       labels={'timestamp': 'Thời gian', 'humidity': 'Độ ẩm (%)'})
+    st.plotly_chart(fig_humid, use_container_width=True)
 with col3:
-    st.line_chart(df.set_index('timestamp')['pressure'])
+    fig_press = px.line(df, x='timestamp', y='pressure',
+                       title='Áp suất',
+                       labels={'timestamp': 'Thời gian', 'pressure': 'Áp suất (hPa)'})
+    st.plotly_chart(fig_press, use_container_width=True)
 
 # Wind direction
 st.subheader("Tốc độ và hướng gió")
 col1, col2 = st.columns(2)
 with col1:
-    st.line_chart(df.set_index('timestamp')['wind_speed'])
+    fig_wind = px.line(df, x='timestamp', y='wind_speed',
+                      title='Tốc độ gió',
+                      labels={'timestamp': 'Thời gian', 'wind_speed': 'Tốc độ gió (m/s)'})
+    st.plotly_chart(fig_wind, use_container_width=True)
 with col2:
-    st.line_chart(df.set_index('timestamp')['wind_direction'])
+    fig_dir = px.line(df, x='timestamp', y='wind_direction',
+                     title='Hướng gió',
+                     labels={'timestamp': 'Thời gian', 'wind_direction': 'Hướng gió (độ)'})
+    st.plotly_chart(fig_dir, use_container_width=True)
 
 # Phần dự đoán
 st.subheader("Dự đoán Chất lượng Không khí")
 
 # Chọn chỉ số cần dự đoán
-target_col = st.selectbox("Chọn chỉ số cần dự đoán:", cols_to_plot)
+target_col = st.selectbox("Chọn chỉ số cần dự đoán:", ['PM2.5', 'PM10', 'NO2', 'CO', 'SO2', 'O3'])
 
 # Chọn mô hình
 model_type = st.selectbox("Chọn mô hình:", ["Linear Regression", "Random Forest"])
@@ -118,14 +164,38 @@ if st.button("Dự đoán"):
     st.write(f"Mean Squared Error: {mse:.2f}")
     st.write(f"R2 Score: {r2:.2f}")
     
-    # Hiển thị biểu đồ so sánh
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.scatter(y_test, y_pred, alpha=0.5)
-    ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2)
-    ax.set_xlabel('Giá trị thực tế')
-    ax.set_ylabel('Giá trị dự đoán')
-    ax.set_title('So sánh giá trị thực tế và dự đoán')
-    st.pyplot(fig)
+    # Hiển thị biểu đồ so sánh với Plotly
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=y_test,
+        y=y_pred,
+        mode='markers',
+        name='Dự đoán',
+        hovertemplate="<b>Giá trị thực tế:</b> %{x}<br>" +
+                     "<b>Giá trị dự đoán:</b> %{y}<br>" +
+                     "<extra></extra>"
+    ))
+    
+    # Thêm đường chéo
+    min_val = min(y_test.min(), y_pred.min())
+    max_val = max(y_test.max(), y_pred.max())
+    fig.add_trace(go.Scatter(
+        x=[min_val, max_val],
+        y=[min_val, max_val],
+        mode='lines',
+        name='Đường chéo',
+        line=dict(dash='dash', color='red')
+    ))
+    
+    fig.update_layout(
+        title='So sánh giá trị thực tế và dự đoán',
+        xaxis_title='Giá trị thực tế',
+        yaxis_title='Giá trị dự đoán',
+        hovermode='closest',
+        showlegend=True
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
 
 # Footer
-st.markdown("Ứng dụng demo Streamlit - Duong Van Nhat | 📍 Hà Nội")
+st.markdown("Ứng dụng demo Streamlit - 📍 Hà Nội")
