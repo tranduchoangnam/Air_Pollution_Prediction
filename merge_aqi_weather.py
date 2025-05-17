@@ -10,6 +10,7 @@ from datetime import datetime
 # Add the parent directory to the path for importing utils
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from utils.timescaledb_util import TimescaleDBUtil
+from moitruongthudo.air_quality_prediction import AirQualityPrediction
 
 def log(message):
     """Log messages with timestamp"""
@@ -144,6 +145,9 @@ def create_merge_aqi_weather_table():
         else:
             log(f"Retrieved {len(air_quality_df)} records from air_quality table")
             
+            # Initialize AQI calculator
+            aqi_calculator = AirQualityPrediction()
+            
             # Process air_quality data
             # 1. Convert UTC time to UTC+7 and remove timezone info
             air_quality_df['utc_time'] = pd.to_datetime(air_quality_df['utc_time'])
@@ -164,17 +168,35 @@ def create_merge_aqi_weather_table():
             for col in ['PM2.5', 'PM10', 'O3', 'SO2', 'NO2', 'CO']:
                 air_quality_df[col] = pd.to_numeric(air_quality_df[col], errors='coerce')
             
-            # Aggregate by hour and location
-            air_quality_hourly = air_quality_df.groupby(['time', 'location']).agg({
-                'PM2.5': 'mean',
-                'PM10': 'mean',
-                'O3': 'mean',
-                'SO2': 'mean',
-                'NO2': 'mean',
-                'CO': 'mean'
-            }).reset_index()
+            # 5. Calculate AQI values for each pollutant
+            log("Calculating AQI values for pollutants from air_quality table...")
+            aqi_mapping = {
+                'PM2.5': 'pm25',     # Mapping for AirQualityPrediction.calculate_aqi
+                'PM10': 'pm10',      # These match the parameter names expected by calculate_aqi
+                'O3': 'o3',
+                'SO2': 'so2',
+                'NO2': 'no2',
+                'CO': 'co'
+            }
             
-            log(f"Processed {len(air_quality_hourly)} hourly records from air_quality table")
+            # Create columns for AQI values
+            for col, aqi_param in aqi_mapping.items():
+                if col in air_quality_df.columns:
+                    # Only process rows with non-null values
+                    # air_quality_df[f'{col}_AQI'] = None
+                    mask = ~air_quality_df[col].isna()
+                    if mask.any():
+                        # Apply AQI calculation to each value
+                        air_quality_df.loc[mask, col] = air_quality_df.loc[mask, col].apply(
+                            lambda x: aqi_calculator.calculate_aqi(x, aqi_param) if pd.notna(x) else None
+                        )
+            
+            # Aggregate by hour and location
+            agg_dict = {col: 'mean' for col in ['PM2.5', 'PM10', 'O3', 'SO2', 'NO2', 'CO']}
+                
+            air_quality_hourly = air_quality_df.groupby(['time', 'location']).agg(agg_dict).reset_index()
+            
+            log(f"Processed {len(air_quality_hourly)} hourly records from air_quality table with AQI calculations")
         
         log("Fetching data from airvisual_waqi_merge_aqi table...")
         airvisual_query = f"""
@@ -352,6 +374,10 @@ def create_merge_aqi_weather_table():
                     null_count_air_quality = 0
                     null_count_existing = 0
                     
+                    # Examine both raw pollutant values and calculated AQI values
+                    pollutant_columns = ['PM2.5', 'PM10', 'O3', 'SO2', 'NO2', 'CO']
+                    
+                    # Count nulls for pollutants in both datasets
                     for col in pollutant_columns:
                         if col in row and pd.isna(row[col]):
                             null_count_air_quality += 1
@@ -360,18 +386,20 @@ def create_merge_aqi_weather_table():
                             null_count_existing += 1
                     
                     # Determine which record has better quality (fewer nulls)
-                    use_air_quality = null_count_air_quality <= null_count_existing
+                    # Prefer air_quality if it has calculated AQI values or if quality is similar
+                    use_air_quality = (null_count_air_quality <= null_count_existing)
                     
                     if use_air_quality:
                         better_quality_records += 1
                         # Use air_quality record as it has better quality
+                        # Only copy over the basic pollutant values that are in the DB schema
                         for col in pollutant_columns:
                             if col in row and pd.notna(row[col]):
                                 merged_df_with_air_quality.loc[match_idx, col] = row[col]
                                 updated_records += 1
                     else:
                         # Keep existing record as it has better quality
-                        # But still fill in any missing values from air_quality
+                        # But still fill in any missing pollutant values from air_quality
                         for col in pollutant_columns:
                             if col in row and pd.notna(row[col]) and pd.isna(merged_df_with_air_quality.loc[match_idx, col].values[0]):
                                 merged_df_with_air_quality.loc[match_idx, col] = row[col]
@@ -390,7 +418,7 @@ def create_merge_aqi_weather_table():
                     log(f"Filled {filled} missing {col} values")
             
             log(f"Updated a total of {updated_records} pollutant values using air_quality data")
-            log(f"Used air_quality as primary source for {better_quality_records} records based on data completeness")
+            log(f"Used air_quality as primary source for {better_quality_records} records based on AQI-calculated data quality")
             
             # Replace the original merged_df with the updated one
             merged_df = merged_df_with_air_quality
