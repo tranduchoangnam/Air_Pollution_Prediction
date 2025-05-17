@@ -17,6 +17,7 @@ tzdata>=2023.3
 
 # For air quality prediction used in moitruongthudo/main.py
 scikit-learn>=0.24.0
+xgboost>=1.5.0
 
 # For data processing and visualization
 matplotlib>=3.3.0
