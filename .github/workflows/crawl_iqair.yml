@@ -31,11 +31,14 @@ jobs:
           pip install -r requirements.txt
           playwright install chromium
         
-      - name: Run crawler
-        run: |
-          python weather-dataset/crawl_iqair.py
-          python moitruongthudo/main.py
-          python merge_aqi_weather.py
+      - name: Run weather crawler
+        run: python weather-dataset/crawl_iqair.py
+      
+      - name: Run moitruongthudo crawler
+        run: python moitruongthudo/main.py
+
+      - name: Merge AQI and weather data
+        run: python merge_aqi_weather.py
 
       - name: Commit and push changes
         run: |
