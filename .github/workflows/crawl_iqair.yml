@@ -30,12 +30,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           playwright install chromium
-        
-      - name: Run weather crawler
-        run: python weather-dataset/crawl_iqair.py
       
       - name: Run moitruongthudo crawler
         run: python moitruongthudo/main.py
+      
+      - name: Run weather crawler
+        run: python weather-dataset/crawl_iqair.py
 
       - name: Merge AQI and weather data
         run: python merge_aqi_weather.py
