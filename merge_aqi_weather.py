@@ -4,6 +4,7 @@
 import os
 import sys
 import pandas as pd
+import pytz
 from datetime import datetime
 
 # Add the parent directory to the path for importing utils
@@ -18,6 +19,7 @@ def log(message):
 def create_merge_aqi_weather_table():
     """
     Merge data from mttd_aqi and airvisual_waqi_merge_aqi tables into a new merge_aqi_weather table.
+    Also incorporates pollutant data from air_quality table when available.
     
     The resulting table contains:
     - time, location (unique key)
@@ -27,6 +29,14 @@ def create_merge_aqi_weather_table():
     Only processes records newer than the latest timestamp in the existing merge_aqi_weather table.
     """
     log("Starting merge process...")
+    
+    # Define location name mapping for air_quality table
+    location_mapping = {
+        'ao Duy Tu': 'Đào Duy Từ',
+        'An Khanh': 'An Khánh',
+        'Minh Khai Bac Tu Liem': 'Minh Khai - Bắc Từ Liêm',
+        'So 46 pho Luu Quang Vu': '46 Lưu Quang Vũ'
+    }
     
     # Connect to TimescaleDB
     ts_db = TimescaleDBUtil()
@@ -97,6 +107,74 @@ def create_merge_aqi_weather_table():
             log(f"Fetching weather data from {buffer_timestamp} onwards (24-hour buffer)")
         else:
             log("Fetching all available weather data")
+            
+        # Step 2.5: Get data from air_quality table for additional pollutant data
+        air_quality_time_filter = ""
+        if latest_timestamp:
+            # Convert to UTC for comparison with air_quality datetimeLocal
+            # Latest timestamp is in UTC+7 without timezone info, so first make it timezone-aware
+            latest_timestamp_aware = pd.to_datetime(latest_timestamp).tz_localize(pytz.timezone('Asia/Bangkok'))
+            # Then convert to UTC
+            latest_timestamp_utc = latest_timestamp_aware.astimezone(pytz.UTC)
+            # Apply buffer in UTC
+            buffer_timestamp_utc = latest_timestamp_utc - pd.Timedelta(hours=1)
+            air_quality_time_filter = f"WHERE \"datetimeLocal\" > '{buffer_timestamp_utc}'"
+            log(f"Fetching air_quality data from {buffer_timestamp_utc} onwards (UTC time)")
+        else:
+            log("Fetching all available air_quality data")
+            
+        log("Fetching data from air_quality table...")
+        air_quality_query = f"""
+            SELECT 
+                "datetimeLocal" as utc_time,
+                location_name,
+                "pm2.5",
+                "pm10",
+                "o3",
+                "so2",
+                "no2",
+                "co"
+            FROM air_quality
+            {air_quality_time_filter}
+        """
+        air_quality_df = ts_db.execute_query(air_quality_query)
+        if air_quality_df is None or air_quality_df.empty:
+            log("[!] No data found in air_quality table for the specified timespan")
+            air_quality_df = pd.DataFrame(columns=['utc_time', 'location_name', 'pm2.5', 'pm10', 'o3', 'so2', 'no2', 'co'])
+        else:
+            log(f"Retrieved {len(air_quality_df)} records from air_quality table")
+            
+            # Process air_quality data
+            # 1. Convert UTC time to UTC+7 and remove timezone info
+            air_quality_df['utc_time'] = pd.to_datetime(air_quality_df['utc_time'])
+            # Check if timestamps are already timezone-aware
+            if air_quality_df['utc_time'].dt.tz is None:
+                air_quality_df['time'] = air_quality_df['utc_time'].dt.tz_localize(pytz.UTC).dt.tz_convert(pytz.timezone('Asia/Bangkok')).dt.tz_localize(None)
+            else:
+                air_quality_df['time'] = air_quality_df['utc_time'].dt.tz_convert(pytz.timezone('Asia/Bangkok')).dt.tz_localize(None)
+            
+            # 2. Map location names
+            air_quality_df['location'] = air_quality_df['location_name'].map(location_mapping).fillna(air_quality_df['location_name'])
+            
+            # 3. Rename pollutant columns to match our naming convention and round to hourly timestamps
+            air_quality_df.rename(columns={'pm2.5': 'PM2.5', 'pm10': 'PM10', 'o3': 'O3', 'so2': 'SO2', 'no2': 'NO2', 'co': 'CO'}, inplace=True)
+            air_quality_df['time'] = air_quality_df['time'].dt.floor('h')
+            
+            # 4. Convert values to numeric and aggregate to hourly resolution
+            for col in ['PM2.5', 'PM10', 'O3', 'SO2', 'NO2', 'CO']:
+                air_quality_df[col] = pd.to_numeric(air_quality_df[col], errors='coerce')
+            
+            # Aggregate by hour and location
+            air_quality_hourly = air_quality_df.groupby(['time', 'location']).agg({
+                'PM2.5': 'mean',
+                'PM10': 'mean',
+                'O3': 'mean',
+                'SO2': 'mean',
+                'NO2': 'mean',
+                'CO': 'mean'
+            }).reset_index()
+            
+            log(f"Processed {len(air_quality_hourly)} hourly records from air_quality table")
         
         log("Fetching data from airvisual_waqi_merge_aqi table...")
         airvisual_query = f"""
@@ -155,13 +233,13 @@ def create_merge_aqi_weather_table():
             if col in airvisual_hourly.columns:
                 # Forward fill within each location group
                 airvisual_hourly[col] = airvisual_hourly.groupby('location')[col].transform(
-                    lambda x: x.fillna(method='ffill').fillna(method='bfill')
+                    lambda x: x.ffill().bfill()
                 )
         
         if 'weather_icon' in airvisual_hourly.columns:
             # Fill missing weather_icon values with the most common value
             most_common_icon = airvisual_hourly['weather_icon'].mode().iloc[0] if not airvisual_hourly['weather_icon'].mode().empty else '01d'
-            airvisual_hourly['weather_icon'].fillna(most_common_icon, inplace=True)
+            airvisual_hourly['weather_icon'] = airvisual_hourly['weather_icon'].fillna(most_common_icon)
         
         # Group by hour and location, then aggregate
         agg_dict = {col: 'mean' for col in numeric_columns if col in airvisual_hourly.columns}
@@ -201,7 +279,7 @@ def create_merge_aqi_weather_table():
         for col in weather_columns:
             if col == 'weather_icon':
                 # Forward fill then backward fill for categorical data
-                weather_data[col] = weather_data[col].fillna(method='ffill').fillna(method='bfill')
+                weather_data[col] = weather_data[col].ffill().bfill()
             else:
                 # Use interpolation for numeric columns
                 weather_data[col] = pd.to_numeric(weather_data[col], errors='coerce')
@@ -243,6 +321,79 @@ def create_merge_aqi_weather_table():
         
         # Combine with merged data
         merged_df = pd.concat([merged_df, hai_batrung_records], ignore_index=True)
+        
+        # Merge in the air_quality data (only for PM2.5 and PM10)
+        if not air_quality_df.empty and 'air_quality_hourly' in locals():
+            log("Merging additional pollutant data from air_quality table...")
+            
+            # Create a copy of merged_df to avoid SettingWithCopyWarning
+            merged_df_with_air_quality = merged_df.copy()
+            
+            # Count records before merging
+            pollutant_columns = ['PM2.5', 'PM10', 'O3', 'SO2', 'NO2', 'CO']
+            missing_before = {col: merged_df_with_air_quality[col].isna().sum() for col in pollutant_columns}
+            
+            # Create a composite key for merging
+            merged_df_with_air_quality['merge_key'] = merged_df_with_air_quality['time'].astype(str) + '_' + merged_df_with_air_quality['location']
+            air_quality_hourly['merge_key'] = air_quality_hourly['time'].astype(str) + '_' + air_quality_hourly['location']
+            
+            # For each location and time combination in air_quality_hourly
+            updated_records = 0
+            better_quality_records = 0
+            for idx, row in air_quality_hourly.iterrows():
+                merge_key = row['merge_key']
+                match_mask = merged_df_with_air_quality['merge_key'] == merge_key
+                
+                if match_mask.any():
+                    # Get the index of the matching record
+                    match_idx = merged_df_with_air_quality.index[match_mask]
+                    
+                    # Count null values in both records to determine which has better quality
+                    null_count_air_quality = 0
+                    null_count_existing = 0
+                    
+                    for col in pollutant_columns:
+                        if col in row and pd.isna(row[col]):
+                            null_count_air_quality += 1
+                        
+                        if pd.isna(merged_df_with_air_quality.loc[match_idx, col].values[0]):
+                            null_count_existing += 1
+                    
+                    # Determine which record has better quality (fewer nulls)
+                    use_air_quality = null_count_air_quality <= null_count_existing
+                    
+                    if use_air_quality:
+                        better_quality_records += 1
+                        # Use air_quality record as it has better quality
+                        for col in pollutant_columns:
+                            if col in row and pd.notna(row[col]):
+                                merged_df_with_air_quality.loc[match_idx, col] = row[col]
+                                updated_records += 1
+                    else:
+                        # Keep existing record as it has better quality
+                        # But still fill in any missing values from air_quality
+                        for col in pollutant_columns:
+                            if col in row and pd.notna(row[col]) and pd.isna(merged_df_with_air_quality.loc[match_idx, col].values[0]):
+                                merged_df_with_air_quality.loc[match_idx, col] = row[col]
+                                updated_records += 1
+            
+            # Remove the temporary merge key
+            merged_df_with_air_quality.drop('merge_key', axis=1, inplace=True)
+            
+            # Count records after merging
+            missing_after = {col: merged_df_with_air_quality[col].isna().sum() for col in pollutant_columns}
+            
+            # Log the number of filled values for each pollutant
+            for col in pollutant_columns:
+                filled = missing_before[col] - missing_after[col]
+                if filled > 0:
+                    log(f"Filled {filled} missing {col} values")
+            
+            log(f"Updated a total of {updated_records} pollutant values using air_quality data")
+            log(f"Used air_quality as primary source for {better_quality_records} records based on data completeness")
+            
+            # Replace the original merged_df with the updated one
+            merged_df = merged_df_with_air_quality
         
         # Remove duplicates based on time and location
         log("Handling potential duplicate records...")
@@ -297,7 +448,7 @@ def create_merge_aqi_weather_table():
                     
                     # Fill null values for this column across all records
                     merged_df[col] = merged_df.groupby('location')[col].transform(
-                        lambda x: x.fillna(method='ffill').fillna(method='bfill')
+                        lambda x: x.ffill().bfill()
                     )
         
         log(f"Merged dataset has {len(merged_df)} records after removing duplicates")
@@ -413,6 +564,18 @@ def create_merge_aqi_weather_table():
 def main():
     """Main function to run the merge process"""
     log("=== Starting AQI and Weather Data Merge Process ===")
+    
+    # Check for --force flag to process all data
+    force_all = "--force" in sys.argv
+    if force_all:
+        log("⚠️ Force flag detected - will process all data from scratch")
+        # Drop the existing table if it exists
+        ts_db = TimescaleDBUtil()
+        if ts_db.connect():
+            ts_db.execute_query("DROP TABLE IF EXISTS merge_aqi_weather")
+            ts_db.disconnect()
+            log("✅ Dropped existing merge_aqi_weather table")
+    
     success = create_merge_aqi_weather_table()
     
     if success:
