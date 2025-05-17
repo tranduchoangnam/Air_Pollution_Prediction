@@ -445,24 +445,29 @@ def add_data_preprocessing_section(notebook):
                      "We'll prepare the data for modeling by handling missing values, "
                      "encoding categorical features, and creating a proper time series dataset.")
     
-    # Select a specific location for initial modeling
-    location_selection_code = """# Focus on a specific location for initial modeling
-# Choose the location with the most data points
-target_location = historical_data['location'].value_counts().index[0]
-print(f"Selected target location for modeling: {target_location}")
+    # Use all locations for modeling, not just one
+    location_selection_code = """# Use all locations for modeling
+# Instead of selecting a single location, we'll use data from all locations
+print(f"Number of unique locations: {historical_data['location'].nunique()}")
+print(f"Locations: {', '.join(historical_data['location'].unique())}")
 
-# Filter data for the target location
-location_data = historical_data[historical_data['location'] == target_location].copy().reset_index(drop=True)
+# Create a copy of all data
+location_data = historical_data.copy().reset_index(drop=True)
 
-# Sort by time to ensure chronological order
-location_data = location_data.sort_values('time').reset_index(drop=True)
+# Sort by location and time to ensure chronological order within each location
+location_data = location_data.sort_values(['location', 'time']).reset_index(drop=True)
 
-# Display basic info about the selected location's data
-print(f"Number of records for {target_location}: {len(location_data)}")
+# Display basic info about the data
+print(f"Total number of records across all locations: {len(location_data)}")
 print(f"Date range: {location_data['time'].min()} to {location_data['time'].max()}")
 print(f"Overall AQI range: {location_data['overall_aqi'].min()} - {location_data['overall_aqi'].max()}")
 
-# Check for missing values in the location dataset
+# Check number of records per location
+location_counts = location_data['location'].value_counts()
+print("\nRecords per location:")
+display(location_counts)
+
+# Check for missing values in the dataset
 missing_values = location_data.isna().sum()
 missing_percentage = (missing_values / len(location_data)) * 100
 
@@ -472,7 +477,7 @@ missing_df = pd.DataFrame({
     'Percentage': missing_percentage
 })
 
-# Display missing values for the location dataset
+# Display missing values
 display(missing_df[missing_df['Missing Values'] > 0].sort_values('Missing Values', ascending=False))"""
     
     add_code_cell(notebook, location_selection_code)
@@ -487,33 +492,100 @@ numeric_cols = ['PM2.5', 'PM10', 'NO2', 'SO2', 'O3', 'CO',
 # First, ensure 'time' is a datetime
 location_data['time'] = pd.to_datetime(location_data['time'])
 
-# Set time as index for interpolation
-location_data_indexed = location_data.set_index('time')
-
-# Interpolate numeric columns
+# Initial check for infinite or extremely large values
 for col in numeric_cols:
-    if location_data_indexed[col].isna().any():
-        # Linear interpolation for missing values
-        location_data_indexed[col] = location_data_indexed[col].interpolate(method='time')
+    # Replace infinities with NaN
+    if (location_data[col] == np.inf).any() or (location_data[col] == -np.inf).any():
+        print(f"Found infinite values in {col}, replacing with NaN")
+        location_data[col] = location_data[col].replace([np.inf, -np.inf], np.nan)
+    
+    # Check for extreme outliers and cap them
+    if col in location_data.columns:
+        q1 = location_data[col].quantile(0.01)
+        q3 = location_data[col].quantile(0.99)
+        iqr = q3 - q1
+        lower_bound = q1 - 3 * iqr
+        upper_bound = q3 + 3 * iqr
         
-        # Forward/backward fill any remaining NAs at edges
-        location_data_indexed[col] = location_data_indexed[col].fillna(method='ffill').fillna(method='bfill')
+        # Identify extreme outliers
+        extreme_mask = (location_data[col] < lower_bound) | (location_data[col] > upper_bound)
+        extreme_count = extreme_mask.sum()
         
-        print(f"Filled missing values in {col}")
+        if extreme_count > 0:
+            print(f"Found {extreme_count} extreme outliers in {col}, capping values")
+            location_data.loc[location_data[col] < lower_bound, col] = lower_bound
+            location_data.loc[location_data[col] > upper_bound, col] = upper_bound
 
-# Handle weather_icon (categorical)
-if 'weather_icon' in location_data_indexed.columns and location_data_indexed['weather_icon'].isna().any():
-    # Fill with mode (most common value)
-    most_common = location_data_indexed['weather_icon'].mode()[0]
-    location_data_indexed['weather_icon'] = location_data_indexed['weather_icon'].fillna(most_common)
-    print(f"Filled missing weather_icon values with most common: {most_common}")
+# Handle missing values for each location separately
+for location in location_data['location'].unique():
+    # Filter for the current location
+    loc_mask = location_data['location'] == location
+    
+    # Get the data for this location and set time as index
+    loc_data = location_data[loc_mask].set_index('time')
+    
+    # Interpolate numeric columns for this location
+    for col in numeric_cols:
+        if col in loc_data.columns and loc_data[col].isna().any():
+            # Linear interpolation for missing values
+            loc_data[col] = loc_data[col].interpolate(method='time')
+            
+            # Forward/backward fill any remaining NAs at edges
+            loc_data[col] = loc_data[col].fillna(method='ffill').fillna(method='bfill')
+    
+    # Handle weather_icon (categorical) for this location
+    if 'weather_icon' in loc_data.columns and loc_data['weather_icon'].isna().any():
+        # Fill with mode (most common value) for this location
+        most_common = loc_data['weather_icon'].mode()[0]
+        loc_data['weather_icon'] = loc_data['weather_icon'].fillna(most_common)
+    
+    # Update the values in the original dataframe
+    location_data.loc[loc_mask, loc_data.columns] = loc_data.values
 
-# Reset index to get time as a column again
-location_data = location_data_indexed.reset_index()
+# Reset index if it was modified
+if location_data.index.name == 'time':
+    location_data = location_data.reset_index()
+
+# Final check for any remaining missing values and fill them
+remaining_nulls = location_data[numeric_cols].isnull().sum()
+if remaining_nulls.sum() > 0:
+    print("Some missing values could not be interpolated. Using column means to fill remaining NaNs.")
+    
+    for col in numeric_cols:
+        if location_data[col].isna().sum() > 0:
+            # For each location, fill with the location mean
+            for location in location_data['location'].unique():
+                loc_mask = location_data['location'] == location
+                loc_mean = location_data.loc[loc_mask, col].mean()
+                
+                # If the location mean is NaN (all values missing), use global mean
+                if pd.isna(loc_mean):
+                    loc_mean = location_data[col].mean()
+                    
+                # If even the global mean is NaN, use 0
+                if pd.isna(loc_mean):
+                    loc_mean = 0
+                    
+                # Fill missing values for this location
+                location_data.loc[loc_mask & location_data[col].isna(), col] = loc_mean
 
 # Check if we've successfully handled all missing values
 remaining_missing = location_data.isna().sum().sum()
 print(f"Remaining missing values after preprocessing: {remaining_missing}")
+
+# Final verification for no NaN values
+if remaining_missing > 0:
+    print("WARNING: Some missing values still remain. Performing final cleanup.")
+    # Identify columns with remaining missing values
+    cols_with_missing = location_data.columns[location_data.isna().any()].tolist()
+    print(f"Columns with missing values: {cols_with_missing}")
+    
+    # Fill any remaining NaNs (as a last resort)
+    location_data = location_data.fillna(0)
+    
+    # Verify no NaNs remain
+    final_check = location_data.isna().sum().sum()
+    print(f"Final missing value count: {final_check}")
 
 # Verify data is complete for the overall_aqi (our target variable)
 print(f"Missing values in overall_aqi: {location_data['overall_aqi'].isna().sum()}")"""
@@ -534,6 +606,11 @@ if 'weather_icon' in location_data.columns:
     location_data = pd.concat([location_data, weather_dummies], axis=1)
     
     print(f"Created {len(weather_dummies.columns)} weather condition dummy variables")
+
+# One-hot encode the location (important for the multi-location model)
+location_dummies = pd.get_dummies(location_data['location'], prefix='location')
+location_data = pd.concat([location_data, location_dummies], axis=1)
+print(f"Created {len(location_dummies.columns)} location dummy variables")
 
 # Extract time-based features
 location_data['hour'] = location_data['time'].dt.hour
@@ -578,7 +655,7 @@ def create_time_series_features(df, target_col='overall_aqi', lag_hours=[1, 2, 3
     - Time-based features (already created in preprocessing)
     
     Args:
-        df: DataFrame with time series data (sorted by time)
+        df: DataFrame with time series data (sorted by location and time)
         target_col: Column to create features for
         lag_hours: List of lag periods (in hours) to create
         rolling_windows: List of rolling window sizes for statistics
@@ -589,42 +666,64 @@ def create_time_series_features(df, target_col='overall_aqi', lag_hours=[1, 2, 3
     # Create a copy to avoid modifying the original
     result_df = df.copy()
     
-    # Make sure data is sorted by time
-    result_df = result_df.sort_values('time').reset_index(drop=True)
-    
-    # Create lagged features
-    for lag in lag_hours:
-        result_df[f'{target_col}_lag_{lag}h'] = result_df[target_col].shift(lag)
-        print(f"Created {target_col}_lag_{lag}h feature")
-    
-    # Create rolling window statistics
-    for window in rolling_windows:
-        # Rolling mean
-        result_df[f'{target_col}_rolling_mean_{window}h'] = result_df[target_col].rolling(window=window).mean().shift(1)
+    # Process each location separately to maintain time series integrity
+    for location in result_df['location'].unique():
+        print(f"Creating time series features for location: {location}")
         
-        # Rolling standard deviation
-        result_df[f'{target_col}_rolling_std_{window}h'] = result_df[target_col].rolling(window=window).std().shift(1)
+        # Filter for this location
+        loc_mask = result_df['location'] == location
         
-        # Rolling min and max
-        result_df[f'{target_col}_rolling_min_{window}h'] = result_df[target_col].rolling(window=window).min().shift(1)
-        result_df[f'{target_col}_rolling_max_{window}h'] = result_df[target_col].rolling(window=window).max().shift(1)
+        # Get indices for this location
+        loc_indices = result_df[loc_mask].index
         
-        print(f"Created rolling statistics with {window}h window")
-    
-    # Create lag differences (rate of change)
-    for lag in lag_hours:
-        if lag > 1:  # Skip lag 1 as it would be the same as regular lag
-            result_df[f'{target_col}_diff_{lag}h'] = result_df[target_col] - result_df[f'{target_col}_lag_{lag}h']
-            print(f"Created difference feature: {target_col}_diff_{lag}h")
-    
-    # Create lagged features for weather variables
-    weather_vars = ['temperature', 'humidity', 'pressure', 'wind_speed']
-    for var in weather_vars:
-        if var in result_df.columns:
-            # 1-hour and 24-hour lags for weather variables
-            result_df[f'{var}_lag_1h'] = result_df[var].shift(1)
-            result_df[f'{var}_lag_24h'] = result_df[var].shift(24)
-            print(f"Created lagged features for {var}")
+        # Sort by time within each location
+        loc_df = result_df.loc[loc_indices].sort_values('time')
+        
+        # Create lagged features
+        for lag in lag_hours:
+            # Calculate lag within this location's data
+            lag_values = loc_df[target_col].shift(lag)
+            # Assign back to the result dataframe
+            result_df.loc[loc_indices, f'{target_col}_lag_{lag}h'] = lag_values.values
+            print(f"Created {target_col}_lag_{lag}h feature for {location}")
+        
+        # Create rolling window statistics
+        for window in rolling_windows:
+            # Rolling mean
+            roll_mean = loc_df[target_col].rolling(window=window).mean().shift(1)
+            result_df.loc[loc_indices, f'{target_col}_rolling_mean_{window}h'] = roll_mean.values
+            
+            # Rolling standard deviation
+            roll_std = loc_df[target_col].rolling(window=window).std().shift(1)
+            result_df.loc[loc_indices, f'{target_col}_rolling_std_{window}h'] = roll_std.values
+            
+            # Rolling min and max
+            roll_min = loc_df[target_col].rolling(window=window).min().shift(1)
+            result_df.loc[loc_indices, f'{target_col}_rolling_min_{window}h'] = roll_min.values
+            
+            roll_max = loc_df[target_col].rolling(window=window).max().shift(1)
+            result_df.loc[loc_indices, f'{target_col}_rolling_max_{window}h'] = roll_max.values
+            
+            print(f"Created rolling statistics with {window}h window for {location}")
+        
+        # Create lag differences (rate of change)
+        for lag in lag_hours:
+            if lag > 1:  # Skip lag 1 as it would be the same as regular lag
+                diff_values = loc_df[target_col].diff(lag)
+                result_df.loc[loc_indices, f'{target_col}_diff_{lag}h'] = diff_values.values
+                print(f"Created difference feature: {target_col}_diff_{lag}h for {location}")
+        
+        # Create lagged features for weather variables
+        weather_vars = ['temperature', 'humidity', 'pressure', 'wind_speed']
+        for var in weather_vars:
+            if var in result_df.columns:
+                # 1-hour and 24-hour lags for weather variables
+                lag1_values = loc_df[var].shift(1)
+                result_df.loc[loc_indices, f'{var}_lag_1h'] = lag1_values.values
+                
+                lag24_values = loc_df[var].shift(24)
+                result_df.loc[loc_indices, f'{var}_lag_24h'] = lag24_values.values
+                print(f"Created lagged features for {var} in {location}")
     
     # Add day/night indicator (6am-6pm is day, else night)
     result_df['is_daytime'] = ((result_df['hour'] >= 6) & (result_df['hour'] < 18)).astype(int)
@@ -654,9 +753,28 @@ print(f"Columns with missing values after feature engineering: {sum(missing_afte
 # We need to handle the NaN values created by lagging operations
 # and split into training and validation sets respecting time order
 
-# First, drop rows with NaN values (these will be the first rows with lagged features)
+# First, determine the maximum lag period
 max_lag = 24  # Our maximum lag is 24 hours
-ts_features_clean = ts_features_df.iloc[max_lag:].copy()
+
+# Instead of just dropping the first N rows, we need to filter per location
+ts_features_clean = pd.DataFrame()
+
+for location in ts_features_df['location'].unique():
+    # Get data for this location
+    loc_data = ts_features_df[ts_features_df['location'] == location].copy()
+    
+    # Sort by time
+    loc_data = loc_data.sort_values('time')
+    
+    # Skip the first max_lag rows for this location (these will have NaN values)
+    if len(loc_data) > max_lag:
+        loc_data_clean = loc_data.iloc[max_lag:].copy()
+        ts_features_clean = pd.concat([ts_features_clean, loc_data_clean])
+
+# Reset index
+ts_features_clean = ts_features_clean.reset_index(drop=True)
+
+print(f"After removing initial rows with NaN values, we have {len(ts_features_clean)} records.")
 
 # Check if we still have any NaN values
 remaining_nans = ts_features_clean.isna().sum().sum()
@@ -668,17 +786,22 @@ if remaining_nans > 0:
     cols_with_nans = ts_features_clean.columns[ts_features_clean.isna().any()].tolist()
     print(f"Columns with remaining NaN values: {cols_with_nans}")
     
-    # For each column with NaNs, fill with appropriate method
-    for col in cols_with_nans:
-        # For rolling statistics, forward fill
-        if 'rolling' in col:
-            ts_features_clean[col] = ts_features_clean[col].fillna(method='ffill')
-        # For lag differences, use 0 (no change)
-        elif 'diff' in col:
-            ts_features_clean[col] = ts_features_clean[col].fillna(0)
-        # For other features, use column mean
-        else:
-            ts_features_clean[col] = ts_features_clean[col].fillna(ts_features_clean[col].mean())
+    # Process by location to maintain time series integrity
+    for location in ts_features_clean['location'].unique():
+        loc_mask = ts_features_clean['location'] == location
+        
+        # For each column with NaNs, fill with appropriate method
+        for col in cols_with_nans:
+            # For rolling statistics, forward fill
+            if 'rolling' in col:
+                ts_features_clean.loc[loc_mask, col] = ts_features_clean.loc[loc_mask, col].fillna(method='ffill')
+            # For lag differences, use 0 (no change)
+            elif 'diff' in col:
+                ts_features_clean.loc[loc_mask, col] = ts_features_clean.loc[loc_mask, col].fillna(0)
+            # For other features, use column mean for that location
+            else:
+                loc_mean = ts_features_clean.loc[loc_mask, col].mean()
+                ts_features_clean.loc[loc_mask, col] = ts_features_clean.loc[loc_mask, col].fillna(loc_mean)
 
 # Define features and target
 target_col = 'overall_aqi'
@@ -693,10 +816,31 @@ features = [col for col in ts_features_clean.columns
 print(f"Number of features for modeling: {len(features)}")
 
 # Split into training and validation sets (80% train, 20% validation)
-# We need to respect the time ordering
-train_size = int(len(ts_features_clean) * 0.8)
-train_df = ts_features_clean.iloc[:train_size]
-val_df = ts_features_clean.iloc[train_size:]
+# We need to split by time for each location to respect chronological order
+train_df = pd.DataFrame()
+val_df = pd.DataFrame()
+
+for location in ts_features_clean['location'].unique():
+    # Get data for this location
+    loc_data = ts_features_clean[ts_features_clean['location'] == location].copy()
+    
+    # Sort by time
+    loc_data = loc_data.sort_values('time')
+    
+    # Calculate split point (80% train, 20% validation)
+    train_size = int(len(loc_data) * 0.8)
+    
+    # Split the data
+    loc_train = loc_data.iloc[:train_size]
+    loc_val = loc_data.iloc[train_size:]
+    
+    # Add to the combined datasets
+    train_df = pd.concat([train_df, loc_train])
+    val_df = pd.concat([val_df, loc_val])
+
+# Reset indices
+train_df = train_df.reset_index(drop=True)
+val_df = val_df.reset_index(drop=True)
 
 print(f"Training set size: {len(train_df)}")
 print(f"Validation set size: {len(val_df)}")
@@ -721,11 +865,46 @@ print("Features scaled successfully")"""
 def add_model_building_section(notebook):
     """Add model building section to the notebook"""
     add_markdown_cell(notebook, "## 6. Model Building\n\n"
-                     "We'll train multiple models to forecast AQI values and compare their performance. "
-                     "The models include XGBoost, Random Forest, and SARIMAX for time series forecasting.")
+                     "We'll train a single model using data from all locations to forecast AQI values. "
+                     "This unified model will learn patterns from across locations while still being able "
+                     "to generate location-specific forecasts.")
     
     # Train models
-    model_training_code = """# Define a function to evaluate a model
+    model_training_code = """# First, check for any remaining NaN values in the training data
+print("Checking for NaN values in the training data...")
+nan_features = X_train.columns[X_train.isna().any()].tolist()
+if nan_features:
+    print(f"Found NaN values in features: {nan_features}")
+    print("Filling NaN values with appropriate strategies")
+    
+    # Create a simple imputer to handle any remaining NaNs
+    from sklearn.impute import SimpleImputer
+    
+    # For numeric features, use mean imputation
+    imputer = SimpleImputer(strategy='mean')
+    X_train_imputed = imputer.fit_transform(X_train)
+    X_val_imputed = imputer.transform(X_val)
+    
+    # Now scale the imputed data
+    X_train_scaled = scaler.fit_transform(X_train_imputed)
+    X_val_scaled = scaler.transform(X_val_imputed)
+    
+    # After imputation, verify no NaNs remain
+    if np.isnan(X_train_scaled).any() or np.isnan(X_val_scaled).any():
+        print("WARNING: NaN values still present after imputation!")
+        # Force replace any remaining NaNs with zeros as a last resort
+        X_train_scaled = np.nan_to_num(X_train_scaled)
+        X_val_scaled = np.nan_to_num(X_val_scaled)
+else:
+    print("No NaN values found in features. Proceeding with training.")
+
+# Verify we have data from all locations in both training and validation sets
+train_locations = train_df['location'].unique()
+val_locations = val_df['location'].unique()
+print(f"Training set has data from {len(train_locations)} locations: {', '.join(train_locations)}")
+print(f"Validation set has data from {len(val_locations)} locations: {', '.join(val_locations)}")
+
+# Define a function to evaluate a model
 def evaluate_model(y_true, y_pred, model_name):
     \"\"\"
     Evaluate model performance using multiple metrics
@@ -742,8 +921,8 @@ def evaluate_model(y_true, y_pred, model_name):
 models = {}
 results = []
 
-# 1. XGBoost Regressor
-print("Training XGBoost model...")
+# 1. XGBoost Regressor - our baseline model
+print("Training XGBoost model using data from all locations...")
 xgb_model = xgb.XGBRegressor(
     n_estimators=100, 
     learning_rate=0.08, 
@@ -758,7 +937,7 @@ models['XGBoost'] = xgb_model
 results.append(evaluate_model(y_val, xgb_pred, 'XGBoost'))
 
 # 2. Random Forest Regressor
-print("Training Random Forest model...")
+print("Training Random Forest model using data from all locations...")
 rf_model = RandomForestRegressor(
     n_estimators=100,
     max_depth=10,
@@ -772,7 +951,7 @@ models['Random Forest'] = rf_model
 results.append(evaluate_model(y_val, rf_pred, 'Random Forest'))
 
 # 3. Gradient Boosting Regressor
-print("Training Gradient Boosting model...")
+print("Training Gradient Boosting model using data from all locations...")
 gb_model = GradientBoostingRegressor(
     n_estimators=100,
     learning_rate=0.1,
@@ -801,15 +980,53 @@ elif best_model_name == 'Random Forest':
 else:
     best_pred = gb_pred
 
-# Plot actual vs predicted
-plt.figure(figsize=(12, 6))
-plt.plot(val_df['time'], y_val, label='Actual', marker='o', markersize=3, linestyle='-', linewidth=1)
-plt.plot(val_df['time'], best_pred, label='Predicted', marker='x', markersize=3, linestyle='--', linewidth=1)
-plt.title(f'Actual vs Predicted AQI Values ({best_model_name})', fontsize=15)
-plt.xlabel('Time', fontsize=12)
-plt.ylabel('Overall AQI', fontsize=12)
-plt.legend()
-plt.grid(True, alpha=0.3)
+# Evaluate per location
+print("\\nEvaluating model performance for each location separately:")
+for location in val_df['location'].unique():
+    # Filter validation data for this location
+    loc_mask = val_df['location'] == location
+    loc_y_true = y_val[loc_mask]
+    loc_y_pred = best_pred[loc_mask]
+    
+    # Calculate metrics for this location
+    loc_mae = mean_absolute_error(loc_y_true, loc_y_pred)
+    loc_rmse = np.sqrt(mean_squared_error(loc_y_true, loc_y_pred))
+    loc_r2 = r2_score(loc_y_true, loc_y_pred)
+    
+    print(f"{location} - MAE: {loc_mae:.2f}, RMSE: {loc_rmse:.2f}, R²: {loc_r2:.3f}")
+
+# Plot actual vs predicted by location
+plt.figure(figsize=(16, 10))
+num_locations = len(val_df['location'].unique())
+cols = min(3, num_locations)
+rows = (num_locations + cols - 1) // cols
+colors = plt.cm.tab10(np.linspace(0, 1, num_locations))
+
+for i, location in enumerate(val_df['location'].unique()):
+    plt.subplot(rows, cols, i+1)
+    
+    # Filter data for this location
+    loc_mask = val_df['location'] == location
+    loc_times = val_df.loc[loc_mask, 'time']
+    loc_y_true = y_val[loc_mask]
+    loc_y_pred = best_pred[loc_mask]
+    
+    # Plot
+    plt.plot(loc_times, loc_y_true, label='Actual', marker='o', markersize=3, 
+             linestyle='-', linewidth=1, color=colors[i])
+    plt.plot(loc_times, loc_y_pred, label='Predicted', marker='x', markersize=3, 
+             linestyle='--', linewidth=1, color='gray')
+    
+    plt.title(f'{location}', fontsize=12)
+    plt.xlabel('Time', fontsize=10)
+    plt.ylabel('AQI', fontsize=10)
+    plt.grid(True, alpha=0.3)
+    plt.xticks(rotation=45, fontsize=8)
+    
+    # Add legend on first subplot only
+    if i == 0:
+        plt.legend(fontsize=8)
+
 plt.tight_layout()
 plt.show()
 
@@ -836,7 +1053,23 @@ if best_model_name in ['XGBoost', 'Random Forest', 'Gradient Boosting']:
     plt.xlabel('Importance', fontsize=12)
     plt.ylabel('Feature', fontsize=12)
     plt.tight_layout()
-    plt.show()"""
+    plt.show()
+    
+    # Check if location features are important
+    loc_features = [f for f in feature_importance['Feature'] if f.startswith('location_')]
+    if loc_features:
+        loc_importance = feature_importance[feature_importance['Feature'].isin(loc_features)]
+        
+        print("\\nLocation feature importance:")
+        display(loc_importance)
+        
+        plt.figure(figsize=(10, 6))
+        sns.barplot(x='Importance', y='Feature', data=loc_importance)
+        plt.title('Location Feature Importance', fontsize=15)
+        plt.xlabel('Importance', fontsize=12)
+        plt.ylabel('Location', fontsize=12)
+        plt.tight_layout()
+        plt.show()"""
     
     add_code_cell(notebook, model_training_code)
     
@@ -911,15 +1144,52 @@ print(f"Improvement: {results_df[results_df['model'] == best_model_name]['RMSE']
 # Save the best model
 models['Tuned ' + best_model_name] = tuned_model
 
-# Plot actual vs predicted for the tuned model
-plt.figure(figsize=(12, 6))
-plt.plot(val_df['time'], y_val, label='Actual', marker='o', markersize=3, linestyle='-', linewidth=1)
-plt.plot(val_df['time'], tuned_pred, label='Predicted (Tuned)', marker='x', markersize=3, linestyle='--', linewidth=1)
-plt.title(f'Actual vs Predicted AQI Values (Tuned {best_model_name})', fontsize=15)
-plt.xlabel('Time', fontsize=12)
-plt.ylabel('Overall AQI', fontsize=12)
-plt.legend()
-plt.grid(True, alpha=0.3)
+# Evaluate tuned model per location
+print("\\nEvaluating tuned model performance for each location separately:")
+for location in val_df['location'].unique():
+    # Filter validation data for this location
+    loc_mask = val_df['location'] == location
+    loc_y_true = y_val[loc_mask]
+    loc_y_pred = tuned_pred[loc_mask]
+    
+    # Calculate metrics for this location
+    loc_mae = mean_absolute_error(loc_y_true, loc_y_pred)
+    loc_rmse = np.sqrt(mean_squared_error(loc_y_true, loc_y_pred))
+    loc_r2 = r2_score(loc_y_true, loc_y_pred)
+    
+    print(f"{location} - MAE: {loc_mae:.2f}, RMSE: {loc_rmse:.2f}, R²: {loc_r2:.3f}")
+
+# Plot actual vs predicted for the tuned model by location
+plt.figure(figsize=(16, 10))
+num_locations = len(val_df['location'].unique())
+cols = min(3, num_locations)
+rows = (num_locations + cols - 1) // cols
+
+for i, location in enumerate(val_df['location'].unique()):
+    plt.subplot(rows, cols, i+1)
+    
+    # Filter data for this location
+    loc_mask = val_df['location'] == location
+    loc_times = val_df.loc[loc_mask, 'time']
+    loc_y_true = y_val[loc_mask]
+    loc_y_pred = tuned_pred[loc_mask]
+    
+    # Plot
+    plt.plot(loc_times, loc_y_true, label='Actual', marker='o', markersize=3, 
+             linestyle='-', linewidth=1, color=colors[i])
+    plt.plot(loc_times, loc_y_pred, label='Predicted (Tuned)', marker='x', markersize=3, 
+             linestyle='--', linewidth=1, color='gray')
+    
+    plt.title(f'{location} - Tuned Model', fontsize=12)
+    plt.xlabel('Time', fontsize=10)
+    plt.ylabel('AQI', fontsize=10)
+    plt.grid(True, alpha=0.3)
+    plt.xticks(rotation=45, fontsize=8)
+    
+    # Add legend on first subplot only
+    if i == 0:
+        plt.legend(fontsize=8)
+
 plt.tight_layout()
 plt.show()"""
     
@@ -1034,137 +1304,181 @@ print(f"Final model performance: MAE={final_model_info['metrics']['mae']:.2f}, R
 def add_forecasting_section(notebook):
     """Add forecasting section to the notebook"""
     add_markdown_cell(notebook, "## 8. Forecasting the Next 24 Hours\n\n"
-                    "Now we'll use our model to forecast AQI values for the next 24 hours.")
+                    "Now we'll use our model to forecast AQI values for the next 24 hours for all locations.")
     
-    forecasting_code = """# Create a function to generate forecast for the next 24 hours
-def forecast_next_24h(model, location_df, features, scaler, target_col='overall_aqi'):
+    forecasting_code = """# Create a function to generate forecast for the next 24 hours for all locations
+def forecast_next_24h(model, location_df, features, scaler, locations=None, target_col='overall_aqi'):
     \"\"\"
-    Generate forecasts for the next 24 hours using the trained model.
+    Generate forecasts for the next 24 hours using the trained model for multiple locations.
     
     Args:
         model: Trained model
         location_df: DataFrame with historical data
         features: List of feature columns
         scaler: Fitted StandardScaler
+        locations: List of specific locations to forecast for, or None for all
         target_col: Target column name
         
     Returns:
-        DataFrame with forecasted values
+        DataFrame with forecasted values for all locations
     \"\"\"
-    # Make a copy of the most recent data
-    forecast_df = location_df.copy().sort_values('time')
+    # If no locations specified, use all available
+    if locations is None:
+        locations = location_df['location'].unique()
     
-    # Get the latest time in the dataset
-    latest_time = forecast_df['time'].max()
-    print(f"Latest time in dataset: {latest_time}")
+    print(f"Generating forecasts for {len(locations)} locations: {', '.join(locations)}")
     
-    # Create a dataframe for the next 24 hours
-    next_hours = pd.date_range(start=latest_time, periods=25, freq='H')[1:]  # Skip the first as it's the latest time
+    # Store forecasts for all locations
+    all_forecasts = []
     
-    # Create forecast dataframe
-    next_24h_df = pd.DataFrame({'time': next_hours})
-    next_24h_df['location'] = forecast_df['location'].iloc[0]  # Use the same location
-    
-    # Generate time-based features
-    next_24h_df['hour'] = next_24h_df['time'].dt.hour
-    next_24h_df['day_of_week'] = next_24h_df['time'].dt.dayofweek
-    next_24h_df['month'] = next_24h_df['time'].dt.month
-    next_24h_df['day_of_year'] = next_24h_df['time'].dt.dayofyear
-    next_24h_df['is_weekend'] = next_24h_df['day_of_week'].isin([5, 6]).astype(int)
-    
-    # Create cyclical features
-    next_24h_df['hour_sin'] = np.sin(2 * np.pi * next_24h_df['hour']/24)
-    next_24h_df['hour_cos'] = np.cos(2 * np.pi * next_24h_df['hour']/24)
-    next_24h_df['month_sin'] = np.sin(2 * np.pi * next_24h_df['month']/12)
-    next_24h_df['month_cos'] = np.cos(2 * np.pi * next_24h_df['month']/12)
-    next_24h_df['day_of_week_sin'] = np.sin(2 * np.pi * next_24h_df['day_of_week']/7)
-    next_24h_df['day_of_week_cos'] = np.cos(2 * np.pi * next_24h_df['day_of_week']/7)
-    
-    # For simplicity, copy the latest weather values to all forecast hours
-    # In a real-world scenario, you'd use weather forecasts instead
-    latest_row = forecast_df.iloc[-1]
-    weather_vars = ['temperature', 'pressure', 'humidity', 'wind_speed', 
-                    'wind_direction', 'dew', 'weather_condition']
-                    
-    for var in weather_vars:
-        if var in forecast_df.columns:
-            next_24h_df[var] = latest_row[var]
-    
-    # Generate wind direction cyclical features
-    if 'wind_direction' in next_24h_df.columns:
-        next_24h_df['wind_direction_sin'] = np.sin(2 * np.pi * next_24h_df['wind_direction']/360)
-        next_24h_df['wind_direction_cos'] = np.cos(2 * np.pi * next_24h_df['wind_direction']/360)
-    
-    # Add weather dummies if they exist in the original data
-    weather_dummies = [col for col in forecast_df.columns if col.startswith('weather_')]
-    for col in weather_dummies:
-        if col in latest_row:
-            next_24h_df[col] = latest_row[col]
-    
-    # For is_daytime
-    next_24h_df['is_daytime'] = ((next_24h_df['hour'] >= 6) & (next_24h_df['hour'] < 18)).astype(int)
-    
-    # Iteratively forecast each hour
-    # Start with the historical data to get lagged values
-    combined_df = pd.concat([forecast_df, next_24h_df], ignore_index=True)
-    
-    # Make 24 predictions, one for each hour
-    for i in range(1, 25):
-        # Index for the hour we're predicting
-        pred_idx = len(forecast_df) + i - 1
+    # Process each location separately
+    for location in locations:
+        print(f"Forecasting for location: {location}")
         
-        # Generate lagged features for the prediction hour
-        lag_hours = [1, 2, 3, 6, 12, 24]
-        rolling_windows = [3, 6, 12, 24]
+        # Make a copy of the data for this location
+        forecast_df = location_df[location_df['location'] == location].copy().sort_values('time')
         
-        # Create lagged values
-        for lag in lag_hours:
-            combined_df.loc[pred_idx, f'{target_col}_lag_{lag}h'] = combined_df.loc[pred_idx - lag, target_col]
+        # Get the latest time in the dataset for this location
+        latest_time = forecast_df['time'].max()
+        print(f"Latest time for {location}: {latest_time}")
         
-        # Create rolling window features
-        for window in rolling_windows:
-            # Use historical values for rolling statistics
-            window_data = combined_df.loc[max(0, pred_idx - window):pred_idx - 1, target_col]
-            
-            combined_df.loc[pred_idx, f'{target_col}_rolling_mean_{window}h'] = window_data.mean()
-            combined_df.loc[pred_idx, f'{target_col}_rolling_std_{window}h'] = window_data.std()
-            combined_df.loc[pred_idx, f'{target_col}_rolling_min_{window}h'] = window_data.min()
-            combined_df.loc[pred_idx, f'{target_col}_rolling_max_{window}h'] = window_data.max()
+        # Create a dataframe for the next 24 hours
+        next_hours = pd.date_range(start=latest_time, periods=25, freq='H')[1:]  # Skip first as it's latest time
         
-        # Create lag differences
-        for lag in lag_hours:
-            if lag > 1:
-                combined_df.loc[pred_idx, f'{target_col}_diff_{lag}h'] = (
-                    combined_df.loc[pred_idx - 1, target_col] - 
-                    combined_df.loc[pred_idx - lag, target_col]
-                )
+        # Create forecast dataframe
+        next_24h_df = pd.DataFrame({'time': next_hours})
+        next_24h_df['location'] = location
         
-        # Create lagged weather features
-        weather_vars = ['temperature', 'humidity', 'pressure', 'wind_speed']
+        # Generate time-based features
+        next_24h_df['hour'] = next_24h_df['time'].dt.hour
+        next_24h_df['day_of_week'] = next_24h_df['time'].dt.dayofweek
+        next_24h_df['month'] = next_24h_df['time'].dt.month
+        next_24h_df['day_of_year'] = next_24h_df['time'].dt.dayofyear
+        next_24h_df['is_weekend'] = next_24h_df['day_of_week'].isin([5, 6]).astype(int)
+        
+        # Create cyclical features
+        next_24h_df['hour_sin'] = np.sin(2 * np.pi * next_24h_df['hour']/24)
+        next_24h_df['hour_cos'] = np.cos(2 * np.pi * next_24h_df['hour']/24)
+        next_24h_df['month_sin'] = np.sin(2 * np.pi * next_24h_df['month']/12)
+        next_24h_df['month_cos'] = np.cos(2 * np.pi * next_24h_df['month']/12)
+        next_24h_df['day_of_week_sin'] = np.sin(2 * np.pi * next_24h_df['day_of_week']/7)
+        next_24h_df['day_of_week_cos'] = np.cos(2 * np.pi * next_24h_df['day_of_week']/7)
+        
+        # Add location dummy variables
+        for loc in locations:
+            col_name = f'location_{loc}'
+            next_24h_df[col_name] = 0
+        
+        # Set the correct location to 1
+        next_24h_df[f'location_{location}'] = 1
+        
+        # For simplicity, copy the latest weather values to all forecast hours
+        # In a real-world scenario, you'd use weather forecasts instead
+        latest_row = forecast_df.iloc[-1]
+        weather_vars = ['temperature', 'pressure', 'humidity', 'wind_speed', 
+                        'wind_direction', 'dew', 'weather_condition']
+                        
         for var in weather_vars:
-            if var in combined_df.columns:
-                combined_df.loc[pred_idx, f'{var}_lag_1h'] = combined_df.loc[pred_idx - 1, var]
-                combined_df.loc[pred_idx, f'{var}_lag_24h'] = combined_df.loc[pred_idx - 24, var]
+            if var in forecast_df.columns:
+                next_24h_df[var] = latest_row[var]
         
-        # Extract features for prediction
-        X_pred = combined_df.loc[pred_idx:pred_idx, features]
+        # Generate wind direction cyclical features
+        if 'wind_direction' in next_24h_df.columns:
+            next_24h_df['wind_direction_sin'] = np.sin(2 * np.pi * next_24h_df['wind_direction']/360)
+            next_24h_df['wind_direction_cos'] = np.cos(2 * np.pi * next_24h_df['wind_direction']/360)
         
-        # Scale features
-        X_pred_scaled = scaler.transform(X_pred)
+        # Add weather dummies if they exist in the original data
+        weather_dummies = [col for col in forecast_df.columns if col.startswith('weather_')]
+        for col in weather_dummies:
+            if col in latest_row:
+                next_24h_df[col] = latest_row[col]
         
-        # Make prediction
-        prediction = model.predict(X_pred_scaled)[0]
+        # For is_daytime
+        next_24h_df['is_daytime'] = ((next_24h_df['hour'] >= 6) & (next_24h_df['hour'] < 18)).astype(int)
         
-        # Store prediction
-        combined_df.loc[pred_idx, target_col] = prediction
+        # Iteratively forecast each hour
+        # Start with the historical data to get lagged values
+        combined_df = pd.concat([forecast_df, next_24h_df], ignore_index=True)
+        
+        # Make 24 predictions, one for each hour
+        for i in range(1, 25):
+            # Index for the hour we're predicting
+            pred_idx = len(forecast_df) + i - 1
+            
+            # Generate lagged features for the prediction hour
+            lag_hours = [1, 2, 3, 6, 12, 24]
+            rolling_windows = [3, 6, 12, 24]
+            
+            # Create lagged values
+            for lag in lag_hours:
+                combined_df.loc[pred_idx, f'{target_col}_lag_{lag}h'] = combined_df.loc[pred_idx - lag, target_col]
+            
+            # Create rolling window features
+            for window in rolling_windows:
+                # Use historical values for rolling statistics
+                window_data = combined_df.loc[max(0, pred_idx - window):pred_idx - 1, target_col]
+                
+                combined_df.loc[pred_idx, f'{target_col}_rolling_mean_{window}h'] = window_data.mean()
+                combined_df.loc[pred_idx, f'{target_col}_rolling_std_{window}h'] = window_data.std()
+                combined_df.loc[pred_idx, f'{target_col}_rolling_min_{window}h'] = window_data.min()
+                combined_df.loc[pred_idx, f'{target_col}_rolling_max_{window}h'] = window_data.max()
+            
+            # Create lag differences
+            for lag in lag_hours:
+                if lag > 1:
+                    combined_df.loc[pred_idx, f'{target_col}_diff_{lag}h'] = (
+                        combined_df.loc[pred_idx - 1, target_col] - 
+                        combined_df.loc[pred_idx - lag, target_col]
+                    )
+            
+            # Create lagged weather features
+            weather_vars = ['temperature', 'humidity', 'pressure', 'wind_speed']
+            for var in weather_vars:
+                if var in combined_df.columns:
+                    combined_df.loc[pred_idx, f'{var}_lag_1h'] = combined_df.loc[pred_idx - 1, var]
+                    combined_df.loc[pred_idx, f'{var}_lag_24h'] = combined_df.loc[pred_idx - 24, var]
+            
+            # Extract features for prediction
+            X_pred = combined_df.loc[pred_idx:pred_idx, features]
+            
+            # Check for and handle any missing values
+            if X_pred.isna().any().any():
+                print(f"Warning: NaN values found in prediction features for hour {i}. Handling missing values.")
+                
+                # Use the same imputer that was used during training (if available)
+                if 'imputer' in globals():
+                    X_pred_imputed = imputer.transform(X_pred)
+                else:
+                    # Otherwise, replace with 0 as a fallback
+                    X_pred_imputed = X_pred.fillna(0).values
+                
+                # Scale features
+                X_pred_scaled = scaler.transform(X_pred_imputed)
+            else:
+                # Scale features
+                X_pred_scaled = scaler.transform(X_pred)
+            
+            # Handle any remaining NaNs (just in case)
+            X_pred_scaled = np.nan_to_num(X_pred_scaled)
+            
+            # Make prediction
+            prediction = model.predict(X_pred_scaled)[0]
+            
+            # Store prediction
+            combined_df.loc[pred_idx, target_col] = prediction
+        
+        # Extract forecast data for this location
+        forecast_result = combined_df.iloc[-24:][['time', 'location', target_col]].copy()
+        forecast_result.rename(columns={target_col: 'forecast'}, inplace=True)
+        
+        # Add to the all locations results
+        all_forecasts.append(forecast_result)
     
-    # Extract forecast data
-    forecast_result = combined_df.iloc[-24:][['time', target_col]].copy()
-    forecast_result.rename(columns={target_col: 'forecast'}, inplace=True)
-    
-    return forecast_result
+    # Combine all location forecasts
+    combined_forecast = pd.concat(all_forecasts, ignore_index=True)
+    return combined_forecast
 
-# Generate forecast for the next 24 hours
+# Generate forecast for the next 24 hours for all locations
 try:
     forecast_df = forecast_next_24h(
         model=final_model,
@@ -1173,27 +1487,88 @@ try:
         scaler=scaler
     )
     
-    print("Forecast for the next 24 hours:")
+    print("Forecast for the next 24 hours across all locations:")
     display(forecast_df)
     
-    # Visualize the forecast
-    plt.figure(figsize=(12, 6))
-    plt.plot(forecast_df['time'], forecast_df['forecast'], 
-            marker='o', linestyle='-', linewidth=2, label='Forecast')
+    # Visualize the forecast for each location
+    plt.figure(figsize=(14, 10))
     
-    # Add the last 48 hours of actual data for context
-    last_48h = ts_features_clean.iloc[-48:][['time', 'overall_aqi']]
-    plt.plot(last_48h['time'], last_48h['overall_aqi'], 
-            marker='x', linestyle='--', linewidth=1, label='Historical')
+    # Get unique locations in the forecast
+    forecast_locations = forecast_df['location'].unique()
     
-    # Add vertical line at the forecast start
-    plt.axvline(x=forecast_df['time'].min(), color='red', linestyle='--', linewidth=1)
+    # Create a subplot for each location
+    n_locations = len(forecast_locations)
+    n_cols = min(3, n_locations)  # Max 3 columns
+    n_rows = (n_locations + n_cols - 1) // n_cols  # Ceiling division
     
-    plt.title('AQI Forecast for the Next 24 Hours', fontsize=15)
+    # Define colors for each location
+    colors = plt.cm.tab10(np.linspace(0, 1, n_locations))
+    
+    for i, location in enumerate(forecast_locations):
+        # Create subplot
+        plt.subplot(n_rows, n_cols, i+1)
+        
+        # Get forecast for this location
+        loc_forecast = forecast_df[forecast_df['location'] == location]
+        
+        # Get historical data for context (last 48 hours)
+        loc_historical = ts_features_clean[ts_features_clean['location'] == location].sort_values('time').iloc[-48:]
+        
+        # Plot forecast
+        plt.plot(loc_forecast['time'], loc_forecast['forecast'], 
+                marker='o', linestyle='-', linewidth=2, color=colors[i], label='Forecast')
+        
+        # Plot historical data
+        plt.plot(loc_historical['time'], loc_historical['overall_aqi'], 
+                marker='x', linestyle='--', linewidth=1, color='gray', alpha=0.7, label='Historical')
+        
+        # Add vertical line at forecast start
+        plt.axvline(x=loc_forecast['time'].min(), color='red', linestyle='--', linewidth=1)
+        
+        # Set title and labels
+        plt.title(f'AQI Forecast: {location}', fontsize=12)
+        plt.xlabel('Time', fontsize=10)
+        plt.ylabel('AQI', fontsize=10)
+        plt.grid(True, alpha=0.3)
+        
+        # Format x-axis to show hours
+        plt.gca().xaxis.set_major_formatter(DateFormatter('%m-%d %Hh'))
+        plt.xticks(rotation=45, fontsize=8)
+        
+        # Add legend on the first subplot only
+        if i == 0:
+            plt.legend(fontsize=8)
+    
+    plt.tight_layout()
+    plt.show()
+    
+    # Create a combined line plot for all locations
+    plt.figure(figsize=(14, 7))
+    
+    for i, location in enumerate(forecast_locations):
+        # Get forecast for this location
+        loc_forecast = forecast_df[forecast_df['location'] == location]
+        
+        # Plot with unique color and marker
+        plt.plot(loc_forecast['time'], loc_forecast['forecast'], 
+                marker='o', linestyle='-', linewidth=2, color=colors[i], label=location)
+    
+    # Add vertical line at forecast start
+    plt.axvline(x=forecast_df['time'].min(), color='black', linestyle='--', linewidth=1)
+    plt.text(forecast_df['time'].min(), plt.ylim()[1]*0.95, 'Forecast Start', 
+             ha='center', va='top', backgroundcolor='white')
+    
+    # Set title and labels
+    plt.title('AQI Forecast for All Locations (Next 24 Hours)', fontsize=15)
     plt.xlabel('Time', fontsize=12)
-    plt.ylabel('Overall AQI', fontsize=12)
+    plt.ylabel('AQI', fontsize=12)
     plt.grid(True, alpha=0.3)
-    plt.legend()
+    plt.legend(title='Location')
+    
+    # Format x-axis to show hours
+    plt.gca().xaxis.set_major_formatter(DateFormatter('%b %d %Hh'))
+    plt.xticks(rotation=45)
+    
     plt.tight_layout()
     plt.show()
     
