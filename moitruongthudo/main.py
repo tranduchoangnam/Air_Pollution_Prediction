@@ -10,6 +10,7 @@ from collections import defaultdict
 # Add the parent directory to the path for importing utils
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.timescaledb_util import TimescaleDBUtil
+from moitruongthudo.air_quality_prediction import AirQualityPrediction
 
 # Các ID và địa điểm tương ứng
 locations = {
@@ -97,12 +98,17 @@ def crawl_location_data(location_id, dtype, existing_data):
             "success": False
         }
 
-# Function to transform crawled data to the format needed for TimescaleDB
-def transform_to_df(crawl_results, output_data):
-    # Pre-allocate a list with estimated size
-    records = []
+# Process crawled data to insert into mttd_aqi table
+def process_for_mttd_aqi(crawl_results):
+    """Transform crawled data to format needed for mttd_aqi table with AQI calculations"""
+    # Initialize AirQualityPrediction instance for AQI calculation
+    aqi_calculator = AirQualityPrediction()
     
-    # Flatten the nested structure in a more efficient way
+    # Create a map to store data by station and timestamp
+    # This helps us merge 'stat' and 'aqi' data
+    station_time_data = defaultdict(dict)
+    
+    # First process all the 'stat' data
     for result in crawl_results:
         if not result["success"]:
             continue
@@ -116,108 +122,200 @@ def transform_to_df(crawl_results, output_data):
                 time = entry.get('time')
                 value = entry.get('value') or entry.get(pollutant)
                 
-                record = {
-                    'time': time,
-                    'data_type': dtype,
-                    'station': station_name,
-                    pollutant: value
-                }
-                records.append(record)
+                # Skip if value is None
+                if value is None:
+                    continue
+                
+                # Try to convert value to float immediately
+                try:
+                    if isinstance(value, str):
+                        value = float(value)
+                except (ValueError, TypeError):
+                    # If conversion fails, keep as is and handle later
+                    pass
+                
+                # Create unique key for station and time
+                key = f"{station_name}_{time}"
+                
+                # Initialize record if needed
+                if key not in station_time_data:
+                    station_time_data[key] = {
+                        'time': time,
+                        'station': station_name,
+                        'data_type': {}  # Store both 'stat' and 'aqi' data
+                    }
+                
+                # Store the data by type
+                if dtype not in station_time_data[key]['data_type']:
+                    station_time_data[key]['data_type'][dtype] = {}
+                
+                # Map the pollutant name to column name in mttd_aqi
+                column_name = pollutant
+                if pollutant == "PM2.5":
+                    column_name = "PM2_5"
+                
+                # Store the value
+                station_time_data[key]['data_type'][dtype][column_name] = value
     
-    # Only use DataFrame creation once at the end
+    # Create records for mttd_aqi table
+    records = []
+    
+    for key, data in station_time_data.items():
+        # Get values preferring 'stat' but falling back to 'aqi'
+        pollutants = {
+            'PM2_5': None, 'PM10': None, 'O3': None, 
+            'SO2': None, 'NO2': None, 'CO': None
+        }
+        
+        # Only get concentration values from 'stat' data
+        if 'stat' in data['data_type']:
+            stat_data = data['data_type']['stat']
+            for pollutant in pollutants:
+                if pollutant in stat_data:
+                    pollutants[pollutant] = stat_data[pollutant]
+        
+        # Calculate AQI values for each pollutant from 'stat' data only
+        aqi_values = {}
+        for pollutant, value in pollutants.items():
+            if value is not None:
+                try:
+                    # Convert value to float before calculation
+                    numeric_value = float(value)
+                    
+                    # Map column name to pollutant name expected by calculate_aqi
+                    aqi_pollutant = pollutant.lower()
+                    if pollutant == 'PM2_5':
+                        aqi_pollutant = 'pm25'
+                    
+                    aqi_value = aqi_calculator.calculate_aqi(numeric_value, aqi_pollutant)
+                    aqi_column = f"{pollutant}_AQI"
+                    aqi_values[aqi_column] = aqi_value
+                except (ValueError, TypeError) as e:
+                    # Log the error and continue with other pollutants
+                    log(f"[!] Error calculating AQI for {pollutant}: {str(e)}")
+        
+        # Fill missing AQI values directly from 'aqi' data without recalculating
+        if 'aqi' in data['data_type']:
+            aqi_data = data['data_type']['aqi']
+            for pollutant in pollutants:
+                aqi_column = f"{pollutant}_AQI"
+                # If we don't have an AQI value for this pollutant yet, use the value from 'aqi' data directly
+                if (aqi_column not in aqi_values or aqi_values[aqi_column] is None) and pollutant in aqi_data:
+                    try:
+                        # Use AQI value directly from 'aqi' data
+                        aqi_value = float(aqi_data[pollutant])
+                        aqi_values[aqi_column] = aqi_value
+                    except (ValueError, TypeError) as e:
+                        log(f"[!] Error using AQI value for {pollutant} from 'aqi' data: {str(e)}")
+        
+        # Calculate overall AQI
+        overall_aqi = None
+        if aqi_values:
+            overall_aqi = max(v for v in aqi_values.values() if v is not None)
+        
+        # Calculate AQI category
+        aqi_category = None
+        if overall_aqi is not None:
+            aqi_category = aqi_calculator.get_aqi_category(overall_aqi)
+        
+        # Create the record
+        record = {
+            'time': data['time'],
+            'station': data['station'],
+            **pollutants,
+            **aqi_values,
+            'AQI': overall_aqi,
+            'AQI_category': aqi_category
+        }
+        
+        records.append(record)
+    
+    # Convert to DataFrame
     if records:
         df = pd.DataFrame(records)
         
-        # Process all datetime conversions at once
+        # Convert timestamp to datetime
         df['time'] = pd.to_datetime(df['time'], errors='coerce')
         
-        # Process all numeric columns at once
-        pollutant_cols = ['PM2.5', 'PM10', 'NO2', 'CO', 'SO2', 'O3']
-        for col in pollutant_cols:
+        # Convert numeric columns
+        numeric_cols = ['PM2_5', 'PM10', 'O3', 'SO2', 'NO2', 'CO', 
+                        'PM2_5_AQI', 'PM10_AQI', 'O3_AQI', 'SO2_AQI', 'NO2_AQI', 'CO_AQI', 'AQI']
+        for col in numeric_cols:
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors='coerce')
-                
-        # Consolidate duplicate records (same time, station, data_type)
-        df = df.groupby(['time', 'station', 'data_type'], as_index=False).first()
         
         return df
+    
     return pd.DataFrame()
 
-# Batch insert function for TimescaleDB
-def batch_insert_to_timescale(df, table_name="air_quality_measurements", batch_size=1000, force_insert=False):
+# Insert data into TimescaleDB mttd_aqi table
+def insert_to_mttd_aqi(df, batch_size=1000):
+    """Insert DataFrame into mttd_aqi table, avoiding duplicates and adding any missing columns automatically"""
     if df.empty:
+        log("[ℹ] No data to insert into mttd_aqi table")
         return 0
-        
+    
     ts_db = TimescaleDBUtil()
     
     if not ts_db.connect():
-        log("[!] Không thể kết nối tới TimescaleDB")
+        log("[!] Cannot connect to TimescaleDB")
         return 0
     
     try:
-        # Create table if it doesn't exist
-        sample_df = df.head(1)
-        ts_db.create_table_from_dataframe(
-            df=sample_df,
-            table_name=table_name,
+        # Log the total number of records to process
+        total_records = len(df)
+        log(f"[ℹ] Processing {total_records} records for insertion into mttd_aqi table")
+        
+        # Check for existing records to avoid duplicates
+        start_time = datetime.now()
+        log(f"[ℹ] Checking for existing records (start time: {start_time.strftime('%H:%M:%S')})...")
+        
+        # Filter out records that already exist in the database
+        filtered_df = ts_db.filter_existing_records(
+            df=df,
+            table_name="mttd_aqi",
             time_column="time",
-            if_exists="append"
+            additional_columns=["station"]
         )
         
-        # If force_insert is True, skip the existence check
-        if not force_insert:
-            # Get existing records first to avoid checking one by one
-            log("[ℹ] Kiểm tra các bản ghi đã tồn tại...")
-            
-            # Get all time, station, data_type combinations from DB
-            existing_query = f"""
-                SELECT time, station, data_type 
-                FROM {table_name}
-                WHERE time >= %s AND time <= %s
-            """
-            
-            min_time = df['time'].min()
-            max_time = df['time'].max()
-            
-            existing_df = ts_db.execute_query(existing_query, [min_time, max_time])
-            
-            if existing_df is not None and not existing_df.empty:
-                # Create a set of tuples for fast lookup
-                existing_records = set(
-                    (row['time'], row['station'], row['data_type']) 
-                    for _, row in existing_df.iterrows()
-                )
-                
-                # Filter out existing records
-                new_records = []
-                for _, row in df.iterrows():
-                    record_key = (row['time'], row['station'], row['data_type'])
-                    if record_key not in existing_records:
-                        new_records.append(row)
-                        
-                # Create new DataFrame with only new records
-                if new_records:
-                    df = pd.DataFrame(new_records)
-                else:
-                    df = pd.DataFrame(columns=df.columns)
+        end_time = datetime.now()
+        duration = (end_time - start_time).total_seconds()
         
-        inserted_count = 0
-        total_records = len(df)
+        if filtered_df is None:
+            log(f"[!] Error checking for existing records (duration: {duration:.2f} seconds)")
+            return 0
         
-        if not df.empty:
-            # Insert in batches
-            for i in range(0, total_records, batch_size):
-                batch_df = df.iloc[i:i+batch_size]
-                success = ts_db.insert_dataframe(
-                    df=batch_df,
-                    table_name=table_name,
-                    if_exists="append"
-                )
-                if success:
-                    inserted_count += len(batch_df)
-                    log(f"[✓] Đã thêm {inserted_count}/{total_records} bản ghi vào TimescaleDB")
+        if filtered_df.empty:
+            log(f"[ℹ] All records already exist in the database (duration: {duration:.2f} seconds)")
+            return 0
         
-        return inserted_count
+        # Insert new records with automatic column adaptation
+        records_count = len(filtered_df)
+        log(f"[ℹ] Found {records_count} new records to insert (duration: {duration:.2f} seconds)")
+        log(f"[ℹ] Inserting {records_count} new records into mttd_aqi table with automatic schema adaptation...")
+        
+        # Use the new flexible_insert_dataframe method that automatically handles missing columns
+        start_time = datetime.now()
+        success = ts_db.flexible_insert_dataframe(
+            df=filtered_df,
+            table_name="mttd_aqi",
+            if_exists="append",
+            batch_size=batch_size
+        )
+        
+        end_time = datetime.now()
+        duration = (end_time - start_time).total_seconds()
+        
+        if success:
+            log(f"[✓] Successfully added {records_count} records to mttd_aqi table (duration: {duration:.2f} seconds)")
+            return records_count
+        else:
+            log(f"[!] Failed to insert records into mttd_aqi table (duration: {duration:.2f} seconds)")
+            return 0
+            
+    except Exception as e:
+        log(f"[!] Error inserting data into mttd_aqi table: {str(e)}")
+        return 0
     finally:
         ts_db.disconnect()
 
@@ -235,53 +333,44 @@ def main():
     
     log("===== Bắt đầu crawl =====")
     
-    # If force_reinsert is true, we'll load all data from the JSON file
+    # If force_reinsert is true, we'll process all data from the JSON file
     if force_reinsert:
-        log("[ℹ] Chế độ force reinsert được kích hoạt - sẽ thêm lại tất cả dữ liệu vào database")
-        # Transform all data from output.json directly
-        all_records = []
+        log("[ℹ] Chế độ force reinsert được kích hoạt - sẽ xử lý lại tất cả dữ liệu từ output.json")
+        
+        # Create artificial crawl results from output.json
+        force_crawl_results = []
         
         for station_id, station_data in output_data.items():
             station_name = station_mapping.get(station_id, station_id)
             
-            for data_type in ['stat', 'aqi']:
-                pollutant_data = station_data.get(data_type, {})
-                
-                for pollutant, measurements in pollutant_data.items():
-                    for entry in measurements:
-                        time = entry.get('time')
-                        value = entry.get('value') or entry.get(pollutant)
-                        
-                        record = {
-                            'time': time,
-                            'data_type': data_type,
-                            'station': station_name,
-                            pollutant: value
-                        }
-                        all_records.append(record)
+            for dtype in ['stat', 'aqi']:
+                if dtype in station_data:
+                    # Create a crawl result object for each data type
+                    result = {
+                        "location_id": station_id,
+                        "location_name": station_name,
+                        "dtype": dtype,
+                        "new_records": station_data[dtype],
+                        "count": sum(len(items) for items in station_data[dtype].values()),
+                        "success": True
+                    }
+                    force_crawl_results.append(result)
         
-        if all_records:
-            df = pd.DataFrame(all_records)
-            
-            # Process all datetime conversions at once
-            df['time'] = pd.to_datetime(df['time'], errors='coerce')
-            
-            # Process all numeric columns at once
-            pollutant_cols = ['PM2.5', 'PM10', 'NO2', 'CO', 'SO2', 'O3']
-            for col in pollutant_cols:
-                if col in df.columns:
-                    df[col] = pd.to_numeric(df[col], errors='coerce')
-                    
-            # Consolidate duplicate records (same time, station, data_type)
-            df = df.groupby(['time', 'station', 'data_type'], as_index=False).first()
-            
-            # Insert all data with force_insert=True
-            log(f"[ℹ] Chuẩn bị thêm {len(df)} bản ghi vào TimescaleDB...")
-            inserted_count = batch_insert_to_timescale(df, force_insert=True)
-            log(f"[✔] Đã thêm {inserted_count} bản ghi vào TimescaleDB")
-            log("===== Kết thúc crawl =====\n")
-            return
+        # Process data from output.json
+        log("[ℹ] Đang xử lý dữ liệu cho bảng mttd_aqi từ output.json...")
+        df = process_for_mttd_aqi(force_crawl_results)
         
+        if not df.empty:
+            # Insert data to mttd_aqi table
+            log(f"[ℹ] Chuẩn bị thêm {len(df)} bản ghi vào bảng mttd_aqi...")
+            inserted_count = insert_to_mttd_aqi(df)
+            log(f"[✔] Đã thêm {inserted_count} bản ghi mới vào bảng mttd_aqi")
+        else:
+            log("[ℹ] Không có bản ghi để thêm vào bảng mttd_aqi từ output.json")
+        
+        log("===== Kết thúc crawl =====\n")
+        return
+    
     # Prepare crawl tasks
     crawl_tasks = []
     for location_id in locations:
@@ -340,23 +429,23 @@ def main():
                 location_id, dtype, _ = task
                 log(f"[!] Exception in crawl task for ID {location_id}, type {dtype}: {str(e)}")
     
-    # Lưu kết quả vào file JSON
+    # Lưu kết quả vào file JSON (vẫn giữ để backup)
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(output_data, f, ensure_ascii=False, indent=2)
     
     log("[✔] Đã lưu dữ liệu phân cấp vào output.json")
     
-    # Transform crawled data to DataFrame for TimescaleDB
-    log("[ℹ] Chuyển đổi dữ liệu cho TimescaleDB...")
-    df = transform_to_df(crawl_results, output_data)
+    # Process data for mttd_aqi table
+    log("[ℹ] Đang xử lý dữ liệu cho bảng mttd_aqi...")
+    df = process_for_mttd_aqi(crawl_results)
     
     if not df.empty:
-        # Insert data to TimescaleDB
-        log(f"[ℹ] Chuẩn bị thêm {len(df)} bản ghi vào TimescaleDB...")
-        inserted_count = batch_insert_to_timescale(df)
-        log(f"[✔] Đã thêm {inserted_count} bản ghi mới vào TimescaleDB")
+        # Insert data to mttd_aqi table
+        log(f"[ℹ] Chuẩn bị thêm {len(df)} bản ghi vào bảng mttd_aqi...")
+        inserted_count = insert_to_mttd_aqi(df)
+        log(f"[✔] Đã thêm {inserted_count} bản ghi mới vào bảng mttd_aqi")
     else:
-        log("[ℹ] Không có bản ghi mới để thêm vào TimescaleDB")
+        log("[ℹ] Không có bản ghi mới để thêm vào bảng mttd_aqi")
     
     log("===== Kết thúc crawl =====\n")
 
