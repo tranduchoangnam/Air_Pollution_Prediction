@@ -7091,3 +7091,25 @@
 [2025-05-21 21:03:19] [✔] Đã thêm 5 bản ghi mới vào bảng mttd_aqi
 [2025-05-21 21:03:19] ===== Kết thúc crawl =====
 
+[2025-05-21 22:03:00] ===== Bắt đầu crawl =====
+[2025-05-21 22:03:02] [✓] AQI - ID 31 (đào duy từ): +4 bản ghi mới
+[2025-05-21 22:03:02] [✓] STAT - ID 31 (đào duy từ): +4 bản ghi mới
+[2025-05-21 22:03:02] [✓] AQI - ID 39 (vân hà): +4 bản ghi mới
+[2025-05-21 22:03:02] [✓] AQI - ID 38 (an khánh): +4 bản ghi mới
+[2025-05-21 22:03:03] [✓] AQI - ID 15 (minh khai bắc từ liêm): +6 bản ghi mới
+[2025-05-21 22:03:03] [✓] STAT - ID 39 (vân hà): +4 bản ghi mới
+[2025-05-21 22:03:03] [✓] AQI - ID 14 (số 46 lưu quang vũ): +6 bản ghi mới
+[2025-05-21 22:03:03] [✓] STAT - ID 38 (an khánh): +4 bản ghi mới
+[2025-05-21 22:03:03] [✓] STAT - ID 15 (minh khai bắc từ liêm): +6 bản ghi mới
+[2025-05-21 22:03:03] [✓] STAT - ID 14 (số 46 lưu quang vũ): +6 bản ghi mới
+[2025-05-21 22:03:03] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-05-21 22:03:03] [ℹ] Đang xử lý dữ liệu cho bảng mttd_aqi...
+[2025-05-21 22:03:03] [ℹ] Chuẩn bị thêm 5 bản ghi vào bảng mttd_aqi...
+[2025-05-21 22:03:05] [ℹ] Processing 5 records for insertion into mttd_aqi table
+[2025-05-21 22:03:05] [ℹ] Checking for existing records (start time: 22:03:05)...
+[2025-05-21 22:03:06] [ℹ] Found 5 new records to insert (duration: 1.31 seconds)
+[2025-05-21 22:03:06] [ℹ] Inserting 5 new records into mttd_aqi table with automatic schema adaptation...
+[2025-05-21 22:03:08] [✓] Successfully added 5 records to mttd_aqi table (duration: 1.91 seconds)
+[2025-05-21 22:03:08] [✔] Đã thêm 5 bản ghi mới vào bảng mttd_aqi
+[2025-05-21 22:03:08] ===== Kết thúc crawl =====
+
