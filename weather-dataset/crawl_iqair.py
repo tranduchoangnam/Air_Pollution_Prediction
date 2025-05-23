@@ -202,7 +202,7 @@ def save_to_csv(data: Dict, location_name: str):
     try:
         print("\nAttempting to connect to TimescaleDB...")
         # Initialize TimescaleDB connection
-        db_url = 'postgres://tsdbadmin:lnmfese700b796cn@gejinnsvx3.aqgqm1fn3z.tsdb.cloud.timescale.com:35582/tsdb?sslmode=require'
+        db_url = 'postgres://tsdbadmin:msk844xlog64qfib@y5s99n9ilz.hzk9co8bbu.tsdb.cloud.timescale.com:34150/tsdb?sslmode=require'
         db_util = TimescaleDBUtil(db_url=db_url)
         
         # Convert single record to DataFrame

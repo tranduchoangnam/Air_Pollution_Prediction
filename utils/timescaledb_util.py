@@ -68,9 +68,10 @@ class TimescaleDBUtil:
                 'port': result.port
             }
             return db_params, db_url
-        
+
         # Hardcoded fallback (not recommended for production)
-        db_url = 'postgres://tsdbadmin:lnmfese700b796cn@gejinnsvx3.aqgqm1fn3z.tsdb.cloud.timescale.com:35582/tsdb?sslmode=require'
+        db_url = 'postgres://tsdbadmin:msk844xlog64qfib@y5s99n9ilz.hzk9co8bbu.tsdb.cloud.timescale.com:34150/tsdb?sslmode=require'
+        
         result = urlparse(db_url)
         db_params = {
             'dbname': result.path[1:],
