@@ -15,7 +15,7 @@ import plotly.graph_objects as go
 
 # Kết nối database
 def get_db_connection():
-    db_url = 'postgresql://tsdbadmin:lnmfese700b796cn@gejinnsvx3.aqgqm1fn3z.tsdb.cloud.timescale.com:35582/tsdb?sslmode=require'
+    db_url = 'postgres://tsdbadmin:msk844xlog64qfib@y5s99n9ilz.hzk9co8bbu.tsdb.cloud.timescale.com:34150/tsdb?sslmode=require'
     return create_engine(db_url)
 
 # Đọc dữ liệu từ bảng merge
