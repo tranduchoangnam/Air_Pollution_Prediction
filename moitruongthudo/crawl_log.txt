@@ -8337,3 +8337,19 @@
 [2025-05-24 08:03:40] [ℹ] Không có bản ghi mới để thêm vào bảng mttd_aqi
 [2025-05-24 08:03:40] ===== Kết thúc crawl =====
 
+[2025-05-24 09:02:58] ===== Bắt đầu crawl =====
+[2025-05-24 09:03:00] [✓] STAT - ID 38 (an khánh): +0 bản ghi mới
+[2025-05-24 09:03:01] [✓] AQI - ID 31 (đào duy từ): +0 bản ghi mới
+[2025-05-24 09:03:01] [✓] AQI - ID 38 (an khánh): +0 bản ghi mới
+[2025-05-24 09:03:01] [✓] AQI - ID 39 (vân hà): +0 bản ghi mới
+[2025-05-24 09:03:01] [✓] STAT - ID 39 (vân hà): +0 bản ghi mới
+[2025-05-24 09:03:01] [✓] STAT - ID 31 (đào duy từ): +0 bản ghi mới
+[2025-05-24 09:03:01] [✓] STAT - ID 14 (số 46 lưu quang vũ): +0 bản ghi mới
+[2025-05-24 09:03:02] [✓] AQI - ID 15 (minh khai bắc từ liêm): +0 bản ghi mới
+[2025-05-24 09:03:02] [✓] AQI - ID 14 (số 46 lưu quang vũ): +0 bản ghi mới
+[2025-05-24 09:03:02] [✓] STAT - ID 15 (minh khai bắc từ liêm): +0 bản ghi mới
+[2025-05-24 09:03:02] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-05-24 09:03:02] [ℹ] Đang xử lý dữ liệu cho bảng mttd_aqi...
+[2025-05-24 09:03:02] [ℹ] Không có bản ghi mới để thêm vào bảng mttd_aqi
+[2025-05-24 09:03:02] ===== Kết thúc crawl =====
+
