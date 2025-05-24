@@ -8191,3 +8191,25 @@
 [2025-05-24 00:10:10] [✔] Đã thêm 5 bản ghi mới vào bảng mttd_aqi
 [2025-05-24 00:10:10] ===== Kết thúc crawl =====
 
+[2025-05-24 01:30:46] ===== Bắt đầu crawl =====
+[2025-05-24 01:30:49] [✓] STAT - ID 38 (an khánh): +4 bản ghi mới
+[2025-05-24 01:30:49] [✓] STAT - ID 31 (đào duy từ): +8 bản ghi mới
+[2025-05-24 01:30:50] [✓] STAT - ID 39 (vân hà): +4 bản ghi mới
+[2025-05-24 01:30:50] [✓] STAT - ID 14 (số 46 lưu quang vũ): +12 bản ghi mới
+[2025-05-24 01:30:50] [✓] STAT - ID 15 (minh khai bắc từ liêm): +12 bản ghi mới
+[2025-05-24 01:30:53] [✓] AQI - ID 39 (vân hà): +4 bản ghi mới
+[2025-05-24 01:30:53] [✓] AQI - ID 31 (đào duy từ): +8 bản ghi mới
+[2025-05-24 01:30:53] [✓] AQI - ID 38 (an khánh): +4 bản ghi mới
+[2025-05-24 01:30:58] [!] Lỗi khi crawl aqi từ ID 15: HTTPSConnectionPool(host='moitruongthudo.vn', port=443): Read timed out. (read timeout=10)
+[2025-05-24 01:30:58] [!] Lỗi khi crawl aqi từ ID 14: HTTPSConnectionPool(host='moitruongthudo.vn', port=443): Read timed out. (read timeout=10)
+[2025-05-24 01:30:58] [✔] Đã lưu dữ liệu phân cấp vào output.json
+[2025-05-24 01:30:58] [ℹ] Đang xử lý dữ liệu cho bảng mttd_aqi...
+[2025-05-24 01:30:58] [ℹ] Chuẩn bị thêm 8 bản ghi vào bảng mttd_aqi...
+[2025-05-24 01:30:59] [ℹ] Processing 8 records for insertion into mttd_aqi table
+[2025-05-24 01:30:59] [ℹ] Checking for existing records (start time: 01:30:59)...
+[2025-05-24 01:31:00] [ℹ] Found 8 new records to insert (duration: 1.09 seconds)
+[2025-05-24 01:31:00] [ℹ] Inserting 8 new records into mttd_aqi table with automatic schema adaptation...
+[2025-05-24 01:31:02] [✓] Successfully added 8 records to mttd_aqi table (duration: 2.16 seconds)
+[2025-05-24 01:31:02] [✔] Đã thêm 8 bản ghi mới vào bảng mttd_aqi
+[2025-05-24 01:31:02] ===== Kết thúc crawl =====
+
