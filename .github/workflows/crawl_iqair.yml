@@ -34,6 +34,9 @@ jobs:
       - name: Run moitruongthudo crawler
         run: python moitruongthudo/main.py
       
+      - name: Run weather forecast crawler
+        run: python utils/openweather_util.py
+
       - name: Run weather crawler
         run: python weather-dataset/crawl_iqair.py
 
