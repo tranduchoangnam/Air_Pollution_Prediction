@@ -2,7 +2,7 @@ import os
 import time
 import requests
 import pandas as pd
-import schedule
+# import schedule
 from datetime import datetime, timedelta, timezone
 
 # —————————————————————————————————————————————
@@ -226,17 +226,17 @@ def fetch_air_quality(period: str):
     except Exception as e:
         print(f"Lỗi khi lưu file {fname}: {e}")
 
-# —————————————————————————————————————————————
-# Lên lịch
-schedule.every().day.at("00:05").do(lambda: fetch_air_quality("daily"))
+# # —————————————————————————————————————————————
+# # Lên lịch
+# schedule.every().day.at("00:05").do(lambda: fetch_air_quality("daily"))
+if __name__ == "__main__":
+    # Chạy ngay lần đầu
+    try:
+        fetch_air_quality("daily")
+    except Exception as e:
+        print(f"Initial fetch daily lỗi:", e)
 
-# Chạy ngay lần đầu
-try:
-    fetch_air_quality("daily")
-except Exception as e:
-    print(f"Initial fetch daily lỗi:", e)
-
-# Vòng lặp chờ schedule
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+# # Vòng lặp chờ schedule
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)
